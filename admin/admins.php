@@ -1,0 +1,311 @@
+<?php
+require_once '../config.php';
+
+// ตรวจสอบว่า login แล้วหรือยัง
+if (!isset($_SESSION['admin_id'])) {
+    header('Location: ../login.php');
+    exit();
+}
+
+// Query ข้อมูล Admin ทั้งหมด
+$sql = "SELECT * FROM admins ORDER BY created_at DESC";
+$result = $conn->query($sql);
+?>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการผู้ดูแลระบบ - Green Digital</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .bg-purple {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body>
+    <?php include 'navbar.php'; ?>
+
+    <div class="container mt-4">
+        <!-- Alert Messages -->
+        <?php if(isset($_GET['success'])): ?>
+            <div class="alert alert-success alert-dismissible fade show">
+                <strong>สำเร็จ!</strong>
+                <?php
+                    if($_GET['success'] == 'added') echo 'เพิ่มผู้ดูแลสำเร็จ!';
+                    if($_GET['success'] == 'updated') echo 'แก้ไขข้อมูลสำเร็จ!';
+                    if($_GET['success'] == 'deleted') echo 'ลบผู้ดูแลสำเร็จ!';
+                ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
+
+        <?php if(isset($_GET['error'])): ?>
+            <div class="alert alert-danger alert-dismissible fade show">
+                <strong>ผิดพลาด!</strong>
+                <?php
+                    if($_GET['error'] == 'username_exists') echo 'Username นี้มีอยู่ในระบบแล้ว!';
+                    if($_GET['error'] == 'password_mismatch') echo 'รหัสผ่านไม่ตรงกัน!';
+                    if($_GET['error'] == 'delete_self') echo 'ไม่สามารถลบตัวเองได้!';
+                    if($_GET['error'] == 'failed') echo 'ดำเนินการไม่สำเร็จ กรุณาลองใหม่!';
+                ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
+
+        <!-- ปุ่มเพิ่ม Admin (เฉพาะ Super Admin) -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>📋 รายการผู้ดูแลระบบ</h4>
+            <?php if($_SESSION['role'] == 'super_admin'): ?>
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addAdminModal">
+                    ➕ เพิ่มผู้ดูแลระบบ
+                </button>
+            <?php endif; ?>
+        </div>
+
+        <!-- ตาราง Admin -->
+        <div class="table-card">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="5%">#</th>
+                            <th width="15%">Username</th>
+                            <th width="20%">ชื่อ-นามสกุล</th>
+                            <th width="20%">Email</th>
+                            <th width="12%">Role</th>
+                            <th width="15%">วันที่สร้าง</th>
+                            <th width="13%" class="text-center">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
+                        while($admin = $result->fetch_assoc()):
+                        ?>
+                        <tr>
+                            <td><?php echo $no++; ?></td>
+                            <td><strong><?php echo htmlspecialchars($admin['username']); ?></strong></td>
+                            <td><?php echo htmlspecialchars($admin['full_name']); ?></td>
+                            <td><?php echo htmlspecialchars($admin['email']); ?></td>
+                            <td>
+                                <?php if($admin['role'] == 'super_admin'): ?>
+                                    <span class="badge bg-purple text-white">Super Admin</span>
+                                <?php else: ?>
+                                    <span class="badge bg-success">Admin</span>
+                                <?php endif; ?>
+                            </td>
+                            <td><?php echo date('d/m/Y H:i', strtotime($admin['created_at'])); ?></td>
+                            <td class="text-center">
+                                <!-- ปุ่มดู -->
+                                <button class="btn btn-info btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#viewModal<?php echo $admin['admin_id']; ?>"
+                                        title="ดูข้อมูล">
+                                    👁️
+                                </button>
+
+                                <!-- ปุ่มแก้ไข (เฉพาะ Super Admin) -->
+                                <?php if($_SESSION['role'] == 'super_admin'): ?>
+                                    <button class="btn btn-warning btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editModal<?php echo $admin['admin_id']; ?>"
+                                            title="แก้ไข">
+                                        ✏️
+                                    </button>
+
+                                    <!-- ปุ่มลบ (ไม่ให้ลบตัวเอง) -->
+                                    <?php if($admin['admin_id'] != $_SESSION['admin_id']): ?>
+                                        <button class="btn btn-danger btn-sm"
+                                                onclick="deleteAdmin(<?php echo $admin['admin_id']; ?>, '<?php echo htmlspecialchars($admin['username']); ?>')"
+                                                title="ลบ">
+                                            🗑️
+                                        </button>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== Modal เพิ่ม Admin (1 Modal) ========== -->
+    <div class="modal fade" id="addAdminModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="sql/admin_add.php">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title">➕ เพิ่มผู้ดูแลระบบ</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Username <span class="text-danger">*</span></label>
+                            <input type="text" name="username" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Password <span class="text-danger">*</span></label>
+                            <input type="password" name="password" class="form-control" minlength="6" required>
+                            <small class="text-muted">ความยาวอย่างน้อย 6 ตัวอักษร</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">ยืนยันรหัสผ่าน <span class="text-danger">*</span></label>
+                            <input type="password" name="confirm_password" class="form-control" minlength="6" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">ชื่อ-นามสกุล <span class="text-danger">*</span></label>
+                            <input type="text" name="full_name" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Role <span class="text-danger">*</span></label>
+                            <select name="role" class="form-select" required>
+                                <option value="admin">Admin</option>
+                                <option value="super_admin">Super Admin</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-success">💾 บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== Loop Modal แก้ไข + Modal ดู (แยกตาม admin_id) ========== -->
+    <?php
+    $result->data_seek(0); // Reset pointer
+    while($admin = $result->fetch_assoc()):
+    ?>
+
+    <!-- Modal ดูข้อมูล -->
+    <div class="modal fade" id="viewModal<?php echo $admin['admin_id']; ?>" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">👁️ ข้อมูลผู้ดูแลระบบ</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="40%">ID:</th>
+                            <td><?php echo $admin['admin_id']; ?></td>
+                        </tr>
+                        <tr>
+                            <th>Username:</th>
+                            <td><strong><?php echo htmlspecialchars($admin['username']); ?></strong></td>
+                        </tr>
+                        <tr>
+                            <th>ชื่อ-นามสกุล:</th>
+                            <td><?php echo htmlspecialchars($admin['full_name']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td><?php echo htmlspecialchars($admin['email']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Role:</th>
+                            <td>
+                                <?php if($admin['role'] == 'super_admin'): ?>
+                                    <span class="badge bg-purple text-white">Super Admin</span>
+                                <?php else: ?>
+                                    <span class="badge bg-success">Admin</span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>วันที่สร้าง:</th>
+                            <td><?php echo date('d/m/Y H:i:s', strtotime($admin['created_at'])); ?></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal แก้ไข -->
+    <div class="modal fade" id="editModal<?php echo $admin['admin_id']; ?>" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="sql/admin_edit.php">
+                    <input type="hidden" name="admin_id" value="<?php echo $admin['admin_id']; ?>">
+
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title">✏️ แก้ไขผู้ดูแลระบบ</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" value="<?php echo htmlspecialchars($admin['username']); ?>" readonly>
+                            <small class="text-muted">Username ไม่สามารถแก้ไขได้</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">รหัสผ่านใหม่ (เว้นว่าง = ไม่เปลี่ยน)</label>
+                            <input type="password" name="password" class="form-control" minlength="6">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">ยืนยันรหัสผ่านใหม่</label>
+                            <input type="password" name="confirm_password" class="form-control" minlength="6">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">ชื่อ-นามสกุล <span class="text-danger">*</span></label>
+                            <input type="text" name="full_name" class="form-control" value="<?php echo htmlspecialchars($admin['full_name']); ?>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($admin['email']); ?>">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Role <span class="text-danger">*</span></label>
+                            <select name="role" class="form-select" required>
+                                <option value="admin" <?php echo $admin['role'] == 'admin' ? 'selected' : ''; ?>>Admin</option>
+                                <option value="super_admin" <?php echo $admin['role'] == 'super_admin' ? 'selected' : ''; ?>>Super Admin</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-warning">💾 บันทึกการแก้ไข</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <?php endwhile; ?>
+
+    <script src="../js/bootstrap.bundle.min.js"></script>
+    <script>
+        function deleteAdmin(id, username) {
+            if (confirm('คุณแน่ใจว่าต้องการลบผู้ดูแล "' + username + '" ?\n\nการกระทำนี้ไม่สามารถย้อนกลับได้!')) {
+                window.location.href = 'sql/admin_delete.php?id=' + id;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Model Canvas - แพลตฟอร์มรับซื้อขยะรีไซเคิล</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif;
+            line-height: 1.5;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 4px solid #10b981;
+        }
+        
+        h1 {
+            color: #10b981;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+        }
+        
+        .green-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        /* BMC Grid Layout */
+        .bmc-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: auto auto;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .bmc-box {
+            background: white;
+            border: 3px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 300px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .bmc-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .bmc-box h2 {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .bmc-box ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .bmc-box li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        
+        .bmc-box li:before {
+            content: "▪";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        /* Specific Box Styles */
+        .key-partners {
+            grid-column: 1;
+            grid-row: 1 / 3;
+            border-color: #8b5cf6;
+            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+        }
+        
+        .key-partners h2 {
+            color: #7c3aed;
+            border-color: #8b5cf6;
+        }
+        
+        .key-partners li:before { color: #8b5cf6; }
+        
+        .key-activities {
+            grid-column: 2;
+            grid-row: 1;
+            border-color: #3b82f6;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        }
+        
+        .key-activities h2 {
+            color: #2563eb;
+            border-color: #3b82f6;
+        }
+        
+        .key-activities li:before { color: #3b82f6; }
+        
+        .key-resources {
+            grid-column: 2;
+            grid-row: 2;
+            border-color: #06b6d4;
+            background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%);
+        }
+        
+        .key-resources h2 {
+            color: #0891b2;
+            border-color: #06b6d4;
+        }
+        
+        .key-resources li:before { color: #06b6d4; }
+        
+        .value-propositions {
+            grid-column: 3;
+            grid-row: 1 / 3;
+            border-color: #10b981;
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            min-height: 400px;
+        }
+        
+        .value-propositions h2 {
+            color: #059669;
+            border-color: #10b981;
+            font-size: 1.3em;
+        }
+        
+        .value-propositions li:before { color: #10b981; }
+        
+        .customer-relationships {
+            grid-column: 4;
+            grid-row: 1;
+            border-color: #ec4899;
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+        }
+        
+        .customer-relationships h2 {
+            color: #db2777;
+            border-color: #ec4899;
+        }
+        
+        .customer-relationships li:before { color: #ec4899; }
+        
+        .channels {
+            grid-column: 4;
+            grid-row: 2;
+            border-color: #f59e0b;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        }
+        
+        .channels h2 {
+            color: #d97706;
+            border-color: #f59e0b;
+        }
+        
+        .channels li:before { color: #f59e0b; }
+        
+        .customer-segments {
+            grid-column: 5;
+            grid-row: 1 / 3;
+            border-color: #f97316;
+            background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
+        }
+        
+        .customer-segments h2 {
+            color: #ea580c;
+            border-color: #f97316;
+        }
+        
+        .customer-segments li:before { color: #f97316; }
+        
+        /* Bottom Row */
+        .cost-structure {
+            border-color: #ef4444;
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            min-height: 250px;
+        }
+        
+        .cost-structure h2 {
+            color: #dc2626;
+            border-color: #ef4444;
+        }
+        
+        .cost-structure li:before { color: #ef4444; }
+        
+        .revenue-streams {
+            border-color: #10b981;
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            min-height: 250px;
+        }
+        
+        .revenue-streams h2 {
+            color: #059669;
+            border-color: #10b981;
+        }
+        
+        .revenue-streams li:before { color: #10b981; }
+        
+        .bottom-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        /* Green Digital Focus Box */
+        .green-focus {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+        
+        .green-focus h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .green-focus p {
+            line-height: 1.8;
+            font-size: 1.05em;
+        }
+        
+        /* Notes */
+        .notes {
+            background: #fffbeb;
+            border: 3px solid #fbbf24;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+        
+        .notes h3 {
+            color: #92400e;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .notes ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .notes li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #78350f;
+        }
+        
+        .notes li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+            color: #666;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                padding: 20px;
+            }
+            
+            .bmc-box {
+                page-break-inside: avoid;
+            }
+        }
+        
+        @media (max-width: 1200px) {
+            .bmc-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+            }
+            
+            .bmc-box {
+                grid-column: 1 !important;
+                grid-row: auto !important;
+                min-height: auto;
+            }
+            
+            .bottom-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Business Model Canvas</h1>
+            <p class="subtitle">แพลตฟอร์มรับซื้อขยะรีไซเคิลถึงที่</p>
+            <span class="green-badge">Green Digital Innovation</span>
+        </header>
+
+        <!-- Main BMC Grid -->
+        <div class="bmc-grid">
+            <!-- 1. Key Partners -->
+            <div class="bmc-box key-partners">
+                <h2>Key Partners<br>พันธมิตรหลัก</h2>
+                <ul>
+                    <li>โรงงานรีไซเคิล - รับซื้อต่อในปริมาณมาก</li>
+                    <li>คอนโด/หมู่บ้านจัดสรร - จุดเข้าถึงลูกค้าเป็นกลุ่ม</li>
+                    <li>องค์กรด้านสิ่งแวดล้อม - ให้ความน่าเชื่อถือและการรับรอง</li>
+                    <li>Payment Gateway - ระบบจ่ายเงินอิเล็กทรอนิกส์</li>
+                    <li>Logistics Partners - ระบบขนส่งและกระจายสินค้า</li>
+                    <li>นิคมอุตสาหกรรม - จุดรับซื้อขยะอุตสาหกรรม</li>
+                </ul>
+            </div>
+
+            <!-- 2. Key Activities -->
+            <div class="bmc-box key-activities">
+                <h2>Key Activities<br>กิจกรรมหลัก</h2>
+                <ul>
+                    <li>พัฒนาและดูแลแพลตฟอร์ม Web/Mobile</li>
+                    <li>บริการรับซื้อขยะถึงที่ตามจุดนัดหมาย</li>
+                    <li>บริหารจัดการราคารับซื้อตามตลาด</li>
+                    <li>ตรวจสอบคุณภาพและคัดแยกขยะ</li>
+                    <li>การตลาดและสร้างเครือข่ายพันธมิตร</li>
+                    <li>พัฒนาระบบ AI วิเคราะห์ประเภทขยะ</li>
+                </ul>
+            </div>
+
+            <!-- 3. Key Resources -->
+            <div class="bmc-box key-resources">
+                <h2>Key Resources<br>ทรัพยากรหลัก</h2>
+                <ul>
+                    <li>Technology Platform - Web App, Database, API</li>
+                    <li>ทีมรับซื้อ - คนขับรถ, พนักงานประเมิน</li>
+                    <li>ยานพาหนะ - รถกระบะ/รถตู้สำหรับรับซื้อ</li>
+                    <li>คลังสินค้า - พื้นที่เก็บขยะชั่วคราว</li>
+                    <li>ฐานข้อมูลราคาเรียลไทม์</li>
+                    <li>Brand & Trust - ความน่าเชื่อถือ</li>
+                </ul>
+            </div>
+
+            <!-- 4. Value Propositions -->
+            <div class="bmc-box value-propositions">
+                <h2>Value Propositions<br>คุณค่าที่นำเสนอ</h2>
+                <ul>
+                    <li><strong>รับซื้อถึงที่</strong> - ไม่ต้องเสียเวลาขนของไปขายเอง สะดวก รวดเร็ว</li>
+                    <li><strong>ราคายุติธรรมและโปร่งใส</strong> - เช็คราคาแบบเรียลไทม์ผ่านแอพ</li>
+                    <li><strong>รวดเร็วและสะดวก</strong> - จองผ่านแอพ รับของภายใน 24-48 ชั่วโมง</li>
+                    <li><strong>ช่วยสิ่งแวดล้อม</strong> - ติดตามปริมาณ CO2 ที่ช่วยลดได้</li>
+                    <li><strong>โปร่งใสและน่าเชื่อถือ</strong> - ชั่งน้ำหนักหน้างาน โอนเงินทันที</li>
+                    <li><strong>Gamification</strong> - สะสมแต้ม ระดับผู้ใช้ รับสิทธิประโยชน์</li>
+                    <li><strong>Dashboard สิ่งแวดล้อม</strong> - แสดงผลกระทบเชิงบวกต่อโลก</li>
+                </ul>
+            </div>
+
+            <!-- 5. Customer Relationships -->
+            <div class="bmc-box customer-relationships">
+                <h2>Customer Relationships<br>ความสัมพันธ์กับลูกค้า</h2>
+                <ul>
+                    <li>Self-Service Platform - ลูกค้าจองเองผ่านเว็บ/แอพ</li>
+                    <li>Chat Support & Hotline - ช่วยเหลือตลอด 24 ชม.</li>
+                    <li>Community Building - กลุ่มแลกเปลี่ยนเทคนิคคัดแยก</li>
+                    <li>Loyalty Program - สะสมแต้ม ส่วนลด รางวัล</li>
+                    <li>Education - คอนเทนต์ให้ความรู้เรื่องรีไซเคิล</li>
+                </ul>
+            </div>
+
+            <!-- 6. Channels -->
+            <div class="bmc-box channels">
+                <h2>Channels<br>ช่องทางเข้าถึง</h2>
+                <ul>
+                    <li>Web Application (หลัก)</li>
+                    <li>Mobile App (พัฒนาต่อ)</li>
+                    <li>Social Media - Facebook, TikTok, IG</li>
+                    <li>Partnership - คอนโด/หมู่บ้านจัดสรร</li>
+                    <li>Community - กลุ่มคนรักษ์โลก</li>
+                </ul>
+            </div>
+
+            <!-- 7. Customer Segments -->
+            <div class="bmc-box customer-segments">
+                <h2>Customer Segments<br>กลุ่มลูกค้าเป้าหมาย</h2>
+                <ul>
+                    <li><strong>ครัวเรือน/คอนโด</strong> - มีขยะรีไซเคิลแต่ไม่มีเวลาหรือไม่สะดวกขนไปขาย</li>
+                    <li><strong>ร้านค้า/ออฟฟิศ</strong> - มีขยะรีไซเคิลจำนวนมาก (กระดาษ กล่อง พลาสติก)</li>
+                    <li><strong>โรงแรม/ห้างฯ</strong> - ต้องการจัดการขยะอย่างยั่งยืน</li>
+                    <li><strong>คนรุ่นใหม่</strong> - ใส่ใจสิ่งแวดล้อมแต่ต้องการความสะดวก</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Bottom Row: Cost & Revenue -->
+        <div class="bottom-row">
+            <!-- 8. Cost Structure -->
+            <div class="bmc-box cost-structure">
+                <h2>Cost Structure<br>โครงสร้างต้นทุน</h2>
+                <ul>
+                    <li><strong>ต้นทุนรับซื้อขยะ</strong> - เงินจ่ายให้ลูกค้า (70-80% ของรายได้จากขายต่อ)</li>
+                    <li><strong>เงินเดือนพนักงาน</strong> - ทีมรับซื้อ, Dev, Customer Service</li>
+                    <li><strong>ค่าเชื้อเพลิง</strong> - รถรับซื้อ</li>
+                    <li><strong>ค่าเช่าคลัง/พื้นที่</strong> - เก็บของชั่วคราว</li>
+                    <li><strong>ค่าพัฒนาระบบ</strong> - Server, Hosting, Maintenance</li>
+                    <li><strong>การตลาด</strong> - โฆษณา, Promotion</li>
+                </ul>
+            </div>
+
+            <!-- 9. Revenue Streams -->
+            <div class="bmc-box revenue-streams">
+                <h2>Revenue Streams<br>แหล่งรายได้</h2>
+                <ul>
+                    <li><strong>กำไรจากการขายต่อ</strong> - รับซื้อในราคาดี ขายต่อให้โรงงานรีไซเคิล</li>
+                    <li><strong>Commission</strong> - หักค่าบริการ 5-10% จากแต่ละรายการ</li>
+                    <li><strong>Premium Service</strong> - บริการรับซื้อด่วนพิเศษ จองคิวล่วงหน้า</li>
+                    <li><strong>Corporate Partnership</strong> - แพ็คเกจสำหรับองค์กร/คอนโด</li>
+                    <li><strong>Advertising</strong> - โฆษณาสินค้า Eco-Friendly บนแพลตฟอร์ม</li>
+                    <li><strong>Carbon Credit</strong> - ขายคาร์บอนเครดิตจากการลด CO2</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Green Digital Focus -->
+        <div class="green-focus">
+            <h3>
+                <span>🌱</span>
+                <span>Green Digital Focus</span>
+            </h3>
+            <p>
+                <strong>ใช้ AI วิเคราะห์ขยะ:</strong> ระบบ AI ช่วยจำแนกประเภทขยะและประเมินราคา
+                | <strong>Dashboard CO2:</strong> แสดงปริมาณ CO2 ที่ช่วยลดได้แบบเรียลไทม์
+                | <strong>Blockchain Tracking:</strong> ตรวจสอบย้อนกลับได้ว่าขยะไปรีไซเคิลจริง
+                | <strong>Community Features:</strong> ให้คนในชุมชนช่วยกันรวบรวมขยะก่อนขาย เพิ่มปริมาณและประสิทธิภาพ
+            </p>
+        </div>
+
+        <!-- Implementation Notes -->
+        <div class="notes">
+            <h3>หมายเหตุสำหรับการนำไปใช้</h3>
+            <ul>
+                <li><strong>ระยะที่ 1 (3 เดือน):</strong> เปิดให้บริการในเขตกรุงเทพและปริมณฑล เน้นคอนโดและหมู่บ้าน</li>
+                <li><strong>ระยะที่ 2 (6 เดือน):</strong> ขยายไปจังหวัดใหญ่ เพิ่ม Partnership กับองค์กรและบริษัท</li>
+                <li><strong>ระยะที่ 3 (12 เดือน):</strong> เปิดตัว Mobile App พร้อม AI และ Blockchain</li>
+                <li><strong>KPI หลัก:</strong> ปริมาณขยะที่รับซื้อ, CO2 ที่ช่วยลด, จำนวนผู้ใช้งาน, ความพึงพอใจ</li>
+                <li><strong>Competitive Advantage:</strong> บริการถึงที่ + ราคายุติธรรม + ติดตาม Impact สิ่งแวดล้อม</li>
+            </ul>
+        </div>
+
+        <footer>
+            <p><strong>Business Model Canvas</strong></p>
+            <p>แพลตฟอร์มรับซื้อขยะรีไซเคิลถึงที่ - Green Digital Innovation</p>
+            <p style="font-size: 0.9em; margin-top: 10px;">สำหรับการแข่งขันทักษะการพัฒนานวัตกรรมเทคโนโลยีธุรกิจดิจิทัล</p>
+        </footer>
+    </div>
+</body>
+</html>
