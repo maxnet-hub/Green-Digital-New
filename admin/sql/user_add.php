@@ -9,15 +9,15 @@ if (!isset($_SESSION['admin_id'])) {
 
 // ตรวจสอบว่ามีการส่งข้อมูลมา
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = trim($_POST['email']);
+    $email = $_POST['email'];
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
-    $first_name = trim($_POST['first_name']);
-    $last_name = trim($_POST['last_name']);
-    $phone = trim($_POST['phone']);
-    $address = trim($_POST['address']);
-    $province = trim($_POST['province']);
-    $district = trim($_POST['district']);
+    $first_name = $_POST['first_name'];
+    $last_name = $_POST['last_name'];
+    $phone = $_POST['phone'];
+    $address = $_POST['address'];
+    $province = $_POST['province'];
+    $district = $_POST['district'];
     $user_level = $_POST['user_level'];
     $status = $_POST['status'];
 
@@ -28,13 +28,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // ตรวจสอบว่า email ซ้ำหรือไม่
-    $check_sql = "SELECT user_id FROM users WHERE email = ?";
-    $check_stmt = $conn->prepare($check_sql);
-    $check_stmt->bind_param("s", $email);
-    $check_stmt->execute();
-    $check_result = $check_stmt->get_result();
+    $check_sql = "SELECT user_id FROM users WHERE email = '$email'";
+    $check_result = mysqli_query($conn, $check_sql);
 
-    if ($check_result->num_rows > 0) {
+    if (mysqli_num_rows($check_result) > 0) {
         header("Location: ../users.php?error=email_exists");
         exit();
     }
@@ -44,22 +41,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // เพิ่มสมาชิกใหม่
     $sql = "INSERT INTO users (email, password, first_name, last_name, phone, address, province, district, user_level, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            VALUES ('$email', '$hashed_password', '$first_name', '$last_name', '$phone', '$address', '$province', '$district', '$user_level', '$status')";
 
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssssssssss", $email, $hashed_password, $first_name, $last_name, $phone, $address, $province, $district, $user_level, $status);
+    $result = mysqli_query($conn, $sql);
 
-    if ($stmt->execute()) {
+    if ($result) {
         header("Location: ../users.php?success=added");
     } else {
         header("Location: ../users.php?error=failed");
     }
-
-    $stmt->close();
-    $check_stmt->close();
 } else {
     header("Location: ../users.php");
 }
-
-$conn->close();
 ?>

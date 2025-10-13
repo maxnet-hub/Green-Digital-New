@@ -18,11 +18,10 @@ if (isset($_GET['id'])) {
     }
 
     // ลบ Admin
-    $sql = "DELETE FROM admins WHERE admin_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $admin_id);
+    $sql = "DELETE FROM admins WHERE admin_id = '$admin_id'";
+    $result = mysqli_query($conn, $sql);
 
-    if ($stmt->execute()) {
+    if ($result) {
         header('Location: ../admins.php?success=deleted');
     } else {
         header('Location: ../admins.php?error=failed');

@@ -10,45 +10,41 @@ if (!isset($_SESSION['admin_id'])) {
 // ตรวจสอบว่ามีการส่งข้อมูลมาหรือไม่
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user_id = $_POST['user_id'];
-    $first_name = trim($_POST['first_name']);
-    $last_name = trim($_POST['last_name']);
-    $phone = trim($_POST['phone']);
-    $address = trim($_POST['address']);
-    $province = trim($_POST['province']);
-    $district = trim($_POST['district']);
+    $first_name = $_POST['first_name'];
+    $last_name = $_POST['last_name'];
+    $phone = $_POST['phone'];
+    $address = $_POST['address'];
+    $province = $_POST['province'];
+    $district = $_POST['district'];
     $user_level = $_POST['user_level'];
-    $total_points = intval($_POST['total_points']);
+    $total_points = $_POST['total_points'];
     $status = $_POST['status'];
+    $password = $_POST['password'];
 
     // UPDATE ข้อมูลสมาชิก
     $sql = "UPDATE users
-            SET first_name = ?,
-                last_name = ?,
-                phone = ?,
-                address = ?,
-                province = ?,
-                district = ?,
-                user_level = ?,
-                total_points = ?,
-                status = ?,
-                updated_at = NOW()
-            WHERE user_id = ?";
+            SET first_name = '$first_name',
+                last_name = '$last_name',
+                phone = '$phone',
+                address = '$address',
+                province = '$province',
+                district = '$district',
+                user_level = '$user_level',
+                total_points = '$total_points',
+                status = '$status',
+                updated_at = NOW()";
 
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssssssssi",
-        $first_name,
-        $last_name,
-        $phone,
-        $address,
-        $province,
-        $district,
-        $user_level,
-        $total_points,
-        $status,
-        $user_id
-    );
+    // ถ้ามีการเปลี่ยนรหัสผ่าน
+    if (!empty($password)) {
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $sql .= ", password = '$hashed_password'";
+    }
 
-    if ($stmt->execute()) {
+    $sql .= " WHERE user_id = '$user_id'";
+
+    $result = mysqli_query($conn, $sql);
+
+    if ($result) {
         header('Location: ../users.php?success=updated');
     } else {
         header('Location: ../users.php?error=failed');

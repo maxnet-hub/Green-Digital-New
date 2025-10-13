@@ -9,14 +9,13 @@ if (!isset($_SESSION['admin_id'])) {
 
 // ตรวจสอบว่ามีการส่ง ID มาหรือไม่
 if (isset($_GET['id'])) {
-    $user_id = intval($_GET['id']);
+    $user_id = $_GET['id'];
 
-    // ลบสมาชิก (ข้อมูลที่เกี่ยวข้องจะถูกลบตาม ON DELETE CASCADE)
-    $sql = "DELETE FROM users WHERE user_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $user_id);
+    // ลบสมาชิก
+    $sql = "DELETE FROM users WHERE user_id = '$user_id'";
+    $result = mysqli_query($conn, $sql);
 
-    if ($stmt->execute()) {
+    if ($result) {
         header('Location: ../users.php?success=deleted');
     } else {
         header('Location: ../users.php?error=failed');

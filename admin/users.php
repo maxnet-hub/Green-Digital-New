@@ -439,6 +439,12 @@ $gold = $conn->query("SELECT COUNT(*) as c FROM users WHERE user_level='Gold'")-
                                 </div>
 
                                 <div class="mb-3">
+                                    <label class="form-label">รหัสผ่านใหม่</label>
+                                    <input type="password" name="password" class="form-control" minlength="6">
+                                    <small class="text-muted">เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัสผ่าน</small>
+                                </div>
+
+                                <div class="mb-3">
                                     <label class="form-label">ชื่อ <span class="text-danger">*</span></label>
                                     <input type="text" name="first_name" class="form-control" value="<?php echo htmlspecialchars($user['first_name']); ?>" required>
                                 </div>

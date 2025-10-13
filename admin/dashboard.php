@@ -132,6 +132,6 @@ $total_revenue = $conn->query("SELECT SUM(total_amount) as total FROM transactio
         </div>
     </div>
 
-    <script src="../css/bootstrap.bundle.min.js"></script>
+    <script src="../js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

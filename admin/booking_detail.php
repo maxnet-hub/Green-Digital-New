@@ -1,0 +1,385 @@
+<?php
+require_once '../config.php';
+
+// ตรวจสอบว่า login แล้วหรือยัง
+if (!isset($_SESSION['admin_id'])) {
+    header('Location: ../login.php');
+    exit();
+}
+
+$admin_id = $_SESSION['admin_id'];
+$booking_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+
+// ดึงข้อมูลการจอง
+$booking_sql = "SELECT b.*,
+                u.first_name, u.last_name, u.phone, u.email, u.address as user_address, u.user_level,
+                a.full_name as assigned_name,
+                (SELECT SUM(quantity) FROM booking_items WHERE booking_id = b.booking_id) as total_weight,
+                (SELECT SUM(subtotal) FROM booking_items WHERE booking_id = b.booking_id) as calculated_total
+                FROM bookings b
+                JOIN users u ON b.user_id = u.user_id
+                LEFT JOIN admins a ON b.assigned_to = a.admin_id
+                WHERE b.booking_id = ?";
+$stmt = $conn->prepare($booking_sql);
+$stmt->bind_param('i', $booking_id);
+$stmt->execute();
+$booking_result = $stmt->get_result();
+
+if (!$booking_result || $booking_result->num_rows == 0) {
+    $_SESSION['error'] = 'ไม่พบการจองนี้';
+    header("Location: bookings.php");
+    exit();
+}
+
+$booking = $booking_result->fetch_assoc();
+
+// ดึงรายการขยะในการจอง
+$items_sql = "SELECT bi.*, rt.type_name, rt.category, rt.co2_reduction
+              FROM booking_items bi
+              JOIN recycle_types rt ON bi.type_id = rt.type_id
+              WHERE bi.booking_id = ?";
+$stmt = $conn->prepare($items_sql);
+$stmt->bind_param('i', $booking_id);
+$stmt->execute();
+$items = $stmt->get_result();
+
+// คำนวณ CO2
+$total_co2 = 0;
+if ($items->num_rows > 0) {
+    $items_data = $items->fetch_all(MYSQLI_ASSOC);
+    foreach ($items_data as $item) {
+        $total_co2 += $item['quantity'] * $item['co2_reduction'];
+    }
+}
+
+// ดึงข้อมูล transaction ถ้ามี
+$transaction = null;
+if ($booking['status'] == 'completed') {
+    $trans_sql = "SELECT * FROM transactions WHERE booking_id = ? LIMIT 1";
+    $stmt = $conn->prepare($trans_sql);
+    $stmt->bind_param('i', $booking_id);
+    $stmt->execute();
+    $trans_result = $stmt->get_result();
+    if ($trans_result && $trans_result->num_rows > 0) {
+        $transaction = $trans_result->fetch_assoc();
+    }
+}
+
+// ดึงรายชื่อ admin ทั้งหมด
+$admins_sql = "SELECT admin_id, full_name FROM admins ORDER BY full_name";
+$admins = $conn->query($admins_sql);
+?>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายละเอียดการจอง #<?php echo str_pad($booking_id, 6, '0', STR_PAD_LEFT); ?> - Green Digital Admin</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .detail-card {
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .item-detail {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .status-timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        .status-timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #dee2e6;
+        }
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #6c757d;
+        }
+        .timeline-item.active::before {
+            background: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <?php include 'navbar.php'; ?>
+
+    <div class="container-fluid mt-4 mb-5">
+        <!-- Alert Messages -->
+        <?php if (isset($_SESSION['success'])): ?>
+            <div class="alert alert-success alert-dismissible fade show">
+                <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
+
+        <!-- Back Button -->
+        <div class="mb-3">
+            <a href="bookings.php" class="btn btn-sm btn-outline-secondary">← กลับ</a>
+        </div>
+
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2>การจอง #<?php echo str_pad($booking_id, 6, '0', STR_PAD_LEFT); ?></h2>
+                        <p class="text-muted mb-0">
+                            สร้างเมื่อ: <?php echo date('d/m/Y H:i', strtotime($booking['created_at'])); ?> น.
+                        </p>
+                    </div>
+                    <div>
+                        <?php if ($booking['status'] == 'pending'): ?>
+                            <span class="badge bg-warning fs-5">รอดำเนินการ</span>
+                        <?php elseif ($booking['status'] == 'confirmed'): ?>
+                            <span class="badge bg-info fs-5">ยืนยันแล้ว</span>
+                        <?php elseif ($booking['status'] == 'completed'): ?>
+                            <span class="badge bg-success fs-5">เสร็จสิ้น</span>
+                        <?php else: ?>
+                            <span class="badge bg-danger fs-5">ยกเลิก</span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-lg-8">
+                <!-- Customer Info -->
+                <div class="detail-card">
+                    <h5 class="mb-3">👤 ข้อมูลลูกค้า</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <strong>ชื่อ-นามสกุล:</strong><br>
+                            <?php echo htmlspecialchars($booking['first_name'] . ' ' . $booking['last_name']); ?>
+                            <span class="badge bg-secondary ms-2"><?php echo $booking['user_level']; ?></span>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <strong>เบอร์โทร:</strong><br>
+                            <a href="tel:<?php echo $booking['phone']; ?>"><?php echo htmlspecialchars($booking['phone']); ?></a>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <strong>อีเมล:</strong><br>
+                            <a href="mailto:<?php echo $booking['email']; ?>"><?php echo htmlspecialchars($booking['email']); ?></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Info -->
+                <div class="detail-card">
+                    <h5 class="mb-3">📋 ข้อมูลการจอง</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>📅 วันที่รับ:</strong><br>
+                            <?php echo date('d/m/Y', strtotime($booking['booking_date'])); ?>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>⏰ เวลา:</strong><br>
+                            <?php echo date('H:i', strtotime($booking['booking_time'])); ?> น.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <strong>📍 ที่อยู่รับขยะ:</strong><br>
+                        <?php echo nl2br(htmlspecialchars($booking['pickup_address'])); ?>
+                    </div>
+                    <?php if ($booking['notes']): ?>
+                        <div class="mb-0">
+                            <strong>📝 หมายเหตุ:</strong><br>
+                            <?php echo nl2br(htmlspecialchars($booking['notes'])); ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Items -->
+                <div class="detail-card">
+                    <h5 class="mb-3">♻️ รายการขยะ</h5>
+                    <?php if (isset($items_data) && count($items_data) > 0): ?>
+                        <?php
+                        $total_subtotal = 0;
+                        foreach ($items_data as $item):
+                            $total_subtotal += $item['subtotal'];
+                        ?>
+                            <div class="item-detail">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h6 class="mb-1"><?php echo htmlspecialchars($item['type_name']); ?></h6>
+                                        <span class="badge bg-secondary text-uppercase"><?php echo $item['category']; ?></span>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-success"><?php echo number_format($item['price_per_kg'], 2); ?> ฿/kg</span>
+                                    </div>
+                                </div>
+                                <div class="row text-center mt-2">
+                                    <div class="col-4">
+                                        <small class="text-muted">น้ำหนัก</small><br>
+                                        <strong><?php echo number_format($item['quantity'], 2); ?> kg</strong>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="text-muted">ราคารวม</small><br>
+                                        <strong class="text-success"><?php echo number_format($item['subtotal'], 2); ?> ฿</strong>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="text-muted">CO2 ลดได้</small><br>
+                                        <strong class="text-info"><?php echo number_format($item['quantity'] * $item['co2_reduction'], 2); ?> kg</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+
+                        <!-- Summary -->
+                        <div class="mt-3 pt-3 border-top">
+                            <div class="row">
+                                <div class="col-6">
+                                    <h6>น้ำหนักรวม:</h6>
+                                    <h4><?php echo number_format($booking['total_weight'], 2); ?> kg</h4>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <h6>ราคารวม:</h6>
+                                    <h4 class="text-success"><?php echo number_format($total_subtotal, 2); ?> ฿</h4>
+                                </div>
+                            </div>
+                            <div class="text-center mt-2">
+                                <span class="badge bg-info fs-6">🌱 ช่วยลด CO2: <?php echo number_format($total_co2, 2); ?> kg</span>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <p class="text-muted mb-0">ไม่พบรายการขยะ</p>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Transaction Info -->
+                <?php if ($transaction): ?>
+                    <div class="detail-card">
+                        <h5 class="mb-3">💳 ข้อมูลธุรกรรม</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <strong>วันที่ทำธุรกรรม:</strong><br>
+                                <?php echo date('d/m/Y H:i', strtotime($transaction['created_at'])); ?> น.
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong>วิธีการชำระเงิน:</strong><br>
+                                <?php
+                                $payment_methods = [
+                                    'cash' => 'เงินสด',
+                                    'bank_transfer' => 'โอนเงิน',
+                                    'promptpay' => 'พร้อมเพย์'
+                                ];
+                                echo $payment_methods[$transaction['payment_method']] ?? $transaction['payment_method'];
+                                ?>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong>สถานะการชำระเงิน:</strong><br>
+                                <?php if ($transaction['payment_status'] == 'paid'): ?>
+                                    <span class="badge bg-success">ชำระแล้ว</span>
+                                <?php elseif ($transaction['payment_status'] == 'pending'): ?>
+                                    <span class="badge bg-warning">รอชำระ</span>
+                                <?php else: ?>
+                                    <span class="badge bg-danger">ล้มเหลว</span>
+                                <?php endif; ?>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong>จำนวนเงิน:</strong><br>
+                                <span class="text-success fs-5"><?php echo number_format($transaction['total_amount'], 2); ?> ฿</span>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-lg-4">
+                <!-- Status Management -->
+                <div class="detail-card">
+                    <h5 class="mb-3">⚙️ จัดการสถานะ</h5>
+                    <form method="POST" action="sql/booking_update_status.php">
+                        <input type="hidden" name="booking_id" value="<?php echo $booking_id; ?>">
+                        <div class="mb-3">
+                            <label class="form-label">สถานะการจอง</label>
+                            <select name="status" class="form-select" <?php echo $booking['status'] == 'cancelled' ? 'disabled' : ''; ?>>
+                                <option value="pending" <?php echo $booking['status'] == 'pending' ? 'selected' : ''; ?>>รอดำเนินการ</option>
+                                <option value="confirmed" <?php echo $booking['status'] == 'confirmed' ? 'selected' : ''; ?>>ยืนยันแล้ว</option>
+                                <option value="completed" <?php echo $booking['status'] == 'completed' ? 'selected' : ''; ?>>เสร็จสิ้น</option>
+                                <option value="cancelled" <?php echo $booking['status'] == 'cancelled' ? 'selected' : ''; ?>>ยกเลิก</option>
+                            </select>
+                        </div>
+                        <?php if ($booking['status'] != 'cancelled'): ?>
+                            <button type="submit" class="btn btn-primary w-100">💾 บันทึกสถานะ</button>
+                        <?php endif; ?>
+                    </form>
+                </div>
+
+                <!-- Assign Admin -->
+                <div class="detail-card">
+                    <h5 class="mb-3">👨‍💼 มอบหมายงาน</h5>
+                    <form method="POST" action="sql/booking_assign.php">
+                        <input type="hidden" name="booking_id" value="<?php echo $booking_id; ?>">
+                        <div class="mb-3">
+                            <label class="form-label">ผู้รับผิดชอบ</label>
+                            <select name="assigned_to" class="form-select">
+                                <option value="">ไม่มี</option>
+                                <?php
+                                $admins->data_seek(0);
+                                while ($admin = $admins->fetch_assoc()):
+                                ?>
+                                    <option value="<?php echo $admin['admin_id']; ?>"
+                                            <?php echo $booking['assigned_to'] == $admin['admin_id'] ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($admin['full_name']); ?>
+                                    </option>
+                                <?php endwhile; ?>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">✅ มอบหมาย</button>
+                    </form>
+                </div>
+
+                <!-- Timeline -->
+                <div class="detail-card">
+                    <h5 class="mb-3">📊 Timeline</h5>
+                    <div class="status-timeline">
+                        <div class="timeline-item active">
+                            <strong>สร้างการจอง</strong><br>
+                            <small class="text-muted"><?php echo date('d/m/Y H:i', strtotime($booking['created_at'])); ?></small>
+                        </div>
+                        <div class="timeline-item <?php echo in_array($booking['status'], ['confirmed', 'completed']) ? 'active' : ''; ?>">
+                            <strong>ยืนยันแล้ว</strong><br>
+                            <small class="text-muted">
+                                <?php echo ($booking['status'] == 'confirmed' || $booking['status'] == 'completed') ? date('d/m/Y H:i', strtotime($booking['updated_at'])) : '-'; ?>
+                            </small>
+                        </div>
+                        <div class="timeline-item <?php echo $booking['status'] == 'completed' ? 'active' : ''; ?>">
+                            <strong>เสร็จสิ้น</strong><br>
+                            <small class="text-muted">
+                                <?php echo $booking['status'] == 'completed' ? date('d/m/Y H:i', strtotime($booking['updated_at'])) : '-'; ?>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

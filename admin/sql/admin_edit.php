@@ -12,8 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $admin_id = $_POST['admin_id'];
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
-    $full_name = trim($_POST['full_name']);
-    $email = trim($_POST['email']);
+    $full_name = $_POST['full_name'];
+    $email = $_POST['email'];
     $role = $_POST['role'];
 
     // ถ้ามีการกรอกรหัสผ่านใหม่
@@ -28,17 +28,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
         // UPDATE พร้อมรหัสผ่านใหม่
-        $sql = "UPDATE admins SET full_name = ?, email = ?, role = ?, password = ? WHERE admin_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssi", $full_name, $email, $role, $hashed_password, $admin_id);
+        $sql = "UPDATE admins SET full_name = '$full_name', email = '$email', role = '$role', password = '$hashed_password' WHERE admin_id = '$admin_id'";
     } else {
         // UPDATE โดยไม่เปลี่ยนรหัสผ่าน
-        $sql = "UPDATE admins SET full_name = ?, email = ?, role = ? WHERE admin_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sssi", $full_name, $email, $role, $admin_id);
+        $sql = "UPDATE admins SET full_name = '$full_name', email = '$email', role = '$role' WHERE admin_id = '$admin_id'";
     }
 
-    if ($stmt->execute()) {
+    $result = mysqli_query($conn, $sql);
+
+    if ($result) {
         header('Location: ../admins.php?success=updated');
     } else {
         header('Location: ../admins.php?error=failed');
