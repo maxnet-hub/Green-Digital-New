@@ -33,6 +33,15 @@ if (!$booking_result || $booking_result->num_rows == 0) {
 
 $booking = $booking_result->fetch_assoc();
 
+// ตรวจสอบสิทธิ์การเข้าถึง: พนักงานเห็นเฉพาะงานที่ได้รับมอบหมาย
+if ($_SESSION['role'] == 'staff') {
+    if ($booking['assigned_to'] != $admin_id) {
+        $_SESSION['error'] = 'คุณไม่มีสิทธิ์เข้าถึงการจองนี้';
+        header("Location: bookings.php");
+        exit();
+    }
+}
+
 // ดึงรายการขยะในการจอง
 $items_sql = "SELECT bi.*, rt.type_name, rt.category, rt.co2_reduction
               FROM booking_items bi
@@ -66,8 +75,16 @@ if ($booking['status'] == 'completed') {
 }
 
 // ดึงรายชื่อ admin ทั้งหมด
-$admins_sql = "SELECT admin_id, full_name FROM admins ORDER BY full_name";
+$admins_sql = "SELECT admin_id, full_name, role FROM admins ORDER BY full_name";
 $admins = $conn->query($admins_sql);
+
+// ดึงประเภทขยะทั้งหมดสำหรับ dropdown เพิ่มรายการ (JOIN กับ prices)
+$recycle_types_sql = "SELECT rt.type_id, rt.type_name, rt.category, p.price_per_kg
+                      FROM recycle_types rt
+                      LEFT JOIN prices p ON rt.type_id = p.type_id AND p.is_current = TRUE
+                      WHERE rt.status = 'active'
+                      ORDER BY rt.category, rt.type_name";
+$recycle_types = $conn->query($recycle_types_sql);
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -218,6 +235,7 @@ $admins = $conn->query($admins_sql);
                     <?php if (isset($items_data) && count($items_data) > 0): ?>
                         <?php
                         $total_subtotal = 0;
+                        $can_edit = ($booking['status'] == 'confirmed');
                         foreach ($items_data as $item):
                             $total_subtotal += $item['subtotal'];
                         ?>
@@ -231,19 +249,57 @@ $admins = $conn->query($admins_sql);
                                         <span class="badge bg-success"><?php echo number_format($item['price_per_kg'], 2); ?> ฿/kg</span>
                                     </div>
                                 </div>
-                                <div class="row text-center mt-2">
-                                    <div class="col-4">
-                                        <small class="text-muted">น้ำหนัก</small><br>
-                                        <strong><?php echo number_format($item['quantity'], 2); ?> kg</strong>
+
+                                <?php if ($can_edit): ?>
+                                    <!-- ฟอร์มแก้ไขน้ำหนัก -->
+                                    <form method="POST" action="sql/booking_update_item.php" class="mb-2">
+                                        <input type="hidden" name="booking_id" value="<?php echo $booking_id; ?>">
+                                        <input type="hidden" name="item_id" value="<?php echo $item['item_id']; ?>">
+                                        <div class="row align-items-end">
+                                            <div class="col-md-4">
+                                                <label class="form-label mb-1"><small>น้ำหนัก (kg)</small></label>
+                                                <input type="number" name="quantity" class="form-control form-control-sm"
+                                                       value="<?php echo $item['quantity']; ?>"
+                                                       step="0.01" min="0.01" required>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <small class="text-muted">ราคารวม</small><br>
+                                                <strong class="text-success"><?php echo number_format($item['subtotal'], 2); ?> ฿</strong>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <button type="submit" class="btn btn-primary btn-sm w-100">💾 บันทึก</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <!-- ปุ่มลบ -->
+                                    <div class="text-end">
+                                        <a href="sql/booking_delete_item.php?booking_id=<?php echo $booking_id; ?>&item_id=<?php echo $item['item_id']; ?>"
+                                           class="btn btn-danger btn-sm"
+                                           onclick="return confirm('ต้องการลบรายการนี้ใช่หรือไม่?')">
+                                            🗑️ ลบรายการ
+                                        </a>
                                     </div>
-                                    <div class="col-4">
-                                        <small class="text-muted">ราคารวม</small><br>
-                                        <strong class="text-success"><?php echo number_format($item['subtotal'], 2); ?> ฿</strong>
+                                <?php else: ?>
+                                    <!-- แสดงแบบ Read-only -->
+                                    <div class="row text-center mt-2">
+                                        <div class="col-4">
+                                            <small class="text-muted">น้ำหนัก</small><br>
+                                            <strong><?php echo number_format($item['quantity'], 2); ?> kg</strong>
+                                        </div>
+                                        <div class="col-4">
+                                            <small class="text-muted">ราคารวม</small><br>
+                                            <strong class="text-success"><?php echo number_format($item['subtotal'], 2); ?> ฿</strong>
+                                        </div>
+                                        <div class="col-4">
+                                            <small class="text-muted">CO2 ลดได้</small><br>
+                                            <strong class="text-info"><?php echo number_format($item['quantity'] * $item['co2_reduction'], 2); ?> kg</strong>
+                                        </div>
                                     </div>
-                                    <div class="col-4">
-                                        <small class="text-muted">CO2 ลดได้</small><br>
-                                        <strong class="text-info"><?php echo number_format($item['quantity'] * $item['co2_reduction'], 2); ?> kg</strong>
-                                    </div>
+                                <?php endif; ?>
+
+                                <div class="text-center mt-2">
+                                    <small class="text-muted">CO2 ลดได้: </small>
+                                    <strong class="text-info"><?php echo number_format($item['quantity'] * $item['co2_reduction'], 2); ?> kg</strong>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -264,8 +320,91 @@ $admins = $conn->query($admins_sql);
                                 <span class="badge bg-info fs-6">🌱 ช่วยลด CO2: <?php echo number_format($total_co2, 2); ?> kg</span>
                             </div>
                         </div>
+
+                        <!-- ฟอร์มเพิ่มรายการใหม่ -->
+                        <?php if ($can_edit): ?>
+                            <div class="mt-4 pt-3 border-top">
+                                <h6 class="mb-3">➕ เพิ่มรายการขยะใหม่</h6>
+                                <form method="POST" action="sql/booking_add_item.php">
+                                    <input type="hidden" name="booking_id" value="<?php echo $booking_id; ?>">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label">ประเภทขยะ</label>
+                                            <select name="type_id" class="form-select" required>
+                                                <option value="">-- เลือกประเภทขยะ --</option>
+                                                <?php
+                                                if ($recycle_types && $recycle_types->num_rows > 0):
+                                                    $recycle_types->data_seek(0);
+                                                    while ($type = $recycle_types->fetch_assoc()):
+                                                ?>
+                                                    <option value="<?php echo $type['type_id']; ?>">
+                                                        [<?php echo htmlspecialchars($type['category']); ?>]
+                                                        <?php echo htmlspecialchars($type['type_name']); ?>
+                                                        (<?php echo number_format($type['price_per_kg'], 2); ?> ฿/kg)
+                                                    </option>
+                                                <?php
+                                                    endwhile;
+                                                endif;
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-2">
+                                            <label class="form-label">น้ำหนัก (kg)</label>
+                                            <input type="number" name="quantity" class="form-control"
+                                                   step="0.01" min="0.01" placeholder="0.00" required>
+                                        </div>
+                                        <div class="col-md-2 mb-2">
+                                            <label class="form-label d-block">&nbsp;</label>
+                                            <button type="submit" class="btn btn-success w-100">➕ เพิ่ม</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        <?php endif; ?>
+
                     <?php else: ?>
                         <p class="text-muted mb-0">ไม่พบรายการขยะ</p>
+
+                        <!-- ฟอร์มเพิ่มรายการใหม่ (กรณีไม่มีรายการเลย) -->
+                        <?php if ($booking['status'] == 'confirmed'): ?>
+                            <div class="mt-3 pt-3 border-top">
+                                <h6 class="mb-3">➕ เพิ่มรายการขยะใหม่</h6>
+                                <form method="POST" action="sql/booking_add_item.php">
+                                    <input type="hidden" name="booking_id" value="<?php echo $booking_id; ?>">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label">ประเภทขยะ</label>
+                                            <select name="type_id" class="form-select" required>
+                                                <option value="">-- เลือกประเภทขยะ --</option>
+                                                <?php
+                                                if ($recycle_types && $recycle_types->num_rows > 0):
+                                                    $recycle_types->data_seek(0);
+                                                    while ($type = $recycle_types->fetch_assoc()):
+                                                ?>
+                                                    <option value="<?php echo $type['type_id']; ?>">
+                                                        [<?php echo htmlspecialchars($type['category']); ?>]
+                                                        <?php echo htmlspecialchars($type['type_name']); ?>
+                                                        (<?php echo number_format($type['price_per_kg'], 2); ?> ฿/kg)
+                                                    </option>
+                                                <?php
+                                                    endwhile;
+                                                endif;
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 mb-2">
+                                            <label class="form-label">น้ำหนัก (kg)</label>
+                                            <input type="number" name="quantity" class="form-control"
+                                                   step="0.01" min="0.01" placeholder="0.00" required>
+                                        </div>
+                                        <div class="col-md-2 mb-2">
+                                            <label class="form-label d-block">&nbsp;</label>
+                                            <button type="submit" class="btn btn-success w-100">➕ เพิ่ม</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
 
@@ -313,45 +452,70 @@ $admins = $conn->query($admins_sql);
                 <!-- Status Management -->
                 <div class="detail-card">
                     <h5 class="mb-3">⚙️ จัดการสถานะ</h5>
-                    <form method="POST" action="sql/booking_update_status.php">
-                        <input type="hidden" name="booking_id" value="<?php echo $booking_id; ?>">
+
+                    <?php if ($booking['status'] == 'confirmed'): ?>
+                        <!-- ถ้าเป็น confirmed แสดงปุ่มไปหน้าชำระเงินโดยตรง -->
                         <div class="mb-3">
-                            <label class="form-label">สถานะการจอง</label>
-                            <select name="status" class="form-select" <?php echo $booking['status'] == 'cancelled' ? 'disabled' : ''; ?>>
-                                <option value="pending" <?php echo $booking['status'] == 'pending' ? 'selected' : ''; ?>>รอดำเนินการ</option>
-                                <option value="confirmed" <?php echo $booking['status'] == 'confirmed' ? 'selected' : ''; ?>>ยืนยันแล้ว</option>
-                                <option value="completed" <?php echo $booking['status'] == 'completed' ? 'selected' : ''; ?>>เสร็จสิ้น</option>
-                                <option value="cancelled" <?php echo $booking['status'] == 'cancelled' ? 'selected' : ''; ?>>ยกเลิก</option>
-                            </select>
+                            <p><strong>สถานะปัจจุบัน:</strong> <span class="badge bg-info">ยืนยันแล้ว</span></p>
+                            <p class="text-muted small">กดปุ่มด้านล่างเพื่อไปหน้าสรุปและชำระเงิน</p>
                         </div>
-                        <?php if ($booking['status'] != 'cancelled'): ?>
-                            <button type="submit" class="btn btn-primary w-100">💾 บันทึกสถานะ</button>
-                        <?php endif; ?>
-                    </form>
+                        <a href="booking_payment.php?id=<?php echo $booking_id; ?>" class="btn btn-success w-100">
+                            💰 ไปหน้าชำระเงิน
+                        </a>
+                    <?php else: ?>
+                        <!-- ฟอร์มเปลี่ยนสถานะปกติ -->
+                        <form method="POST" action="sql/booking_update_status.php">
+                            <input type="hidden" name="booking_id" value="<?php echo $booking_id; ?>">
+                            <div class="mb-3">
+                                <label class="form-label">สถานะการจอง</label>
+                                <select name="status" class="form-select" <?php echo $booking['status'] == 'cancelled' || $booking['status'] == 'completed' ? 'disabled' : ''; ?>>
+                                    <option value="pending" <?php echo $booking['status'] == 'pending' ? 'selected' : ''; ?>>รอดำเนินการ</option>
+                                    <option value="confirmed" <?php echo $booking['status'] == 'confirmed' ? 'selected' : ''; ?>>ยืนยันแล้ว</option>
+                                    <option value="completed" <?php echo $booking['status'] == 'completed' ? 'selected' : ''; ?>>เสร็จสิ้น</option>
+                                    <option value="cancelled" <?php echo $booking['status'] == 'cancelled' ? 'selected' : ''; ?>>ยกเลิก</option>
+                                </select>
+                            </div>
+                            <?php if ($booking['status'] != 'cancelled' && $booking['status'] != 'completed'): ?>
+                                <button type="submit" class="btn btn-primary w-100">💾 บันทึกสถานะ</button>
+                            <?php endif; ?>
+                        </form>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Assign Admin -->
                 <div class="detail-card">
                     <h5 class="mb-3">👨‍💼 มอบหมายงาน</h5>
-                    <form method="POST" action="sql/booking_assign.php">
-                        <input type="hidden" name="booking_id" value="<?php echo $booking_id; ?>">
+                    <?php if ($_SESSION['role'] == 'admin' || $_SESSION['role'] == 'owner'): ?>
+                        <!-- ฟอร์มแก้ไขได้ (แอดมิน/เจ้าของร้าน) -->
+                        <form method="POST" action="sql/booking_assign.php">
+                            <input type="hidden" name="booking_id" value="<?php echo $booking_id; ?>">
+                            <div class="mb-3">
+                                <label class="form-label">ผู้รับผิดชอบ</label>
+                                <select name="assigned_to" class="form-select">
+                                    <option value="">ไม่มี</option>
+                                    <?php
+                                    $admins->data_seek(0);
+                                    while ($admin = $admins->fetch_assoc()):
+                                    ?>
+                                        <option value="<?php echo $admin['admin_id']; ?>"
+                                                <?php echo $booking['assigned_to'] == $admin['admin_id'] ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($admin['full_name']); ?>
+                                        </option>
+                                    <?php endwhile; ?>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">✅ มอบหมาย</button>
+                        </form>
+                    <?php else: ?>
+                        <!-- แสดงแบบ Read-only (พนักงาน) -->
                         <div class="mb-3">
                             <label class="form-label">ผู้รับผิดชอบ</label>
-                            <select name="assigned_to" class="form-select">
-                                <option value="">ไม่มี</option>
-                                <?php
-                                $admins->data_seek(0);
-                                while ($admin = $admins->fetch_assoc()):
-                                ?>
-                                    <option value="<?php echo $admin['admin_id']; ?>"
-                                            <?php echo $booking['assigned_to'] == $admin['admin_id'] ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($admin['full_name']); ?>
-                                    </option>
-                                <?php endwhile; ?>
-                            </select>
+                            <input type="text" class="form-control"
+                                   value="<?php echo $booking['assigned_name'] ? htmlspecialchars($booking['assigned_name']) : 'ไม่มี'; ?>"
+                                   readonly>
                         </div>
-                        <button type="submit" class="btn btn-success w-100">✅ มอบหมาย</button>
-                    </form>
+                        <p class="text-muted small mb-0">* พนักงานไม่สามารถแก้ไขได้</p>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Timeline -->

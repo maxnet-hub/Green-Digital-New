@@ -19,14 +19,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ตรวจสอบข้อมูล
     if (empty($booking_date) || empty($booking_time) || empty($pickup_address)) {
         $_SESSION['error'] = 'กรุณากรอกข้อมูลให้ครบถ้วน';
-        header("Location: ../booking_create.php");
+        header("Location: ../bookings.php");
         exit();
     }
 
     // ตรวจสอบว่ามีการเลือกประเภทขยะและระบุน้ำหนัก
     if (empty($selected_types) || count($selected_types) == 0) {
         $_SESSION['error'] = 'กรุณาเลือกประเภทขยะอย่างน้อย 1 รายการ';
-        header("Location: ../booking_create.php");
+        header("Location: ../bookings.php");
         exit();
     }
 
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($weight <= 0) {
             $_SESSION['error'] = 'กรุณาระบุน้ำหนักสำหรับทุกรายการที่เลือก';
-            header("Location: ../booking_create.php");
+            header("Location: ../bookings.php");
             exit();
         }
 
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($valid_items)) {
         $_SESSION['error'] = 'ไม่พบรายการที่ถูกต้อง';
-        header("Location: ../booking_create.php");
+        header("Location: ../bookings.php");
         exit();
     }
 
@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tomorrow = strtotime('+1 day', strtotime(date('Y-m-d')));
     if ($booking_datetime < $tomorrow) {
         $_SESSION['error'] = 'กรุณาจองล่วงหน้าอย่างน้อย 1 วัน';
-        header("Location: ../booking_create.php");
+        header("Location: ../bookings.php");
         exit();
     }
 
@@ -128,11 +128,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_rollback($conn);
 
         $_SESSION['error'] = 'เกิดข้อผิดพลาด: ' . $e->getMessage();
-        header("Location: ../booking_create.php");
+        header("Location: ../bookings.php");
         exit();
     }
 } else {
-    header("Location: ../booking_create.php");
+    header("Location: ../bookings.php");
     exit();
 }
-?>

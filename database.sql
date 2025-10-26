@@ -37,7 +37,7 @@ CREATE TABLE admins (
     password VARCHAR(255) NOT NULL,
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(100),
-    role ENUM('super_admin', 'admin') DEFAULT 'admin',
+    role ENUM('admin', 'owner', 'staff') DEFAULT 'staff',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_username (username),
     INDEX idx_role (role)
@@ -295,7 +295,7 @@ CREATE TABLE reviews (
 
 -- Admin ตัวอย่าง (รหัสผ่าน: admin123 - ต้องเข้ารหัสในระบบจริง)
 INSERT INTO admins (username, password, full_name, email, role) VALUES
-('admin', '$2y$10$YourHashedPasswordHere', 'ผู้ดูแลระบบ', 'admin@greendigital.com', 'super_admin');
+('admin', '$2y$10$YourHashedPasswordHere', 'ผู้ดูแลระบบ', 'admin@greendigital.com', 'admin');
 
 -- ประเภทขยะตัวอย่าง
 INSERT INTO recycle_types (type_name, category, description, co2_reduction, status) VALUES

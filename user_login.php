@@ -43,7 +43,7 @@
                 </form>
 
                 <div class="text-center mt-3">
-                    <p class="mb-2">ยังไม่มีบัญชี? <a href="register.php" class="text-decoration-none">สมัครสมาชิก</a></p>
+                    <p class="mb-2">ยังไม่มีบัญชี? <a href="user_register.php" class="text-decoration-none">สมัครสมาชิก</a></p>
                     <a href="index.php" class="text-decoration-none">← กลับหน้าหลัก</a>
                 </div>
             </div>

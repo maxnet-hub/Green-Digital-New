@@ -13,6 +13,12 @@ $admin_id = $_SESSION['admin_id'];
 $where_conditions = ["1=1"];
 $params = [];
 
+// ตรวจสอบสิทธิ์: พนักงานเห็นเฉพาะงานที่ได้รับมอบหมาย
+if ($_SESSION['role'] == 'staff') {
+    $where_conditions[] = "b.assigned_to = ?";
+    $params[] = $admin_id;
+}
+
 // Filter by status
 if (isset($_GET['status']) && $_GET['status'] != '') {
     $where_conditions[] = "b.status = ?";
@@ -63,8 +69,18 @@ $bookings = $stmt->get_result();
 
 // นับจำนวนตามสถานะ
 $status_counts = [];
-$status_sql = "SELECT status, COUNT(*) as count FROM bookings GROUP BY status";
-$status_result = $conn->query($status_sql);
+if ($_SESSION['role'] == 'staff') {
+    // พนักงานนับเฉพาะงานที่ได้รับมอบหมาย
+    $status_sql = "SELECT status, COUNT(*) as count FROM bookings WHERE assigned_to = ? GROUP BY status";
+    $stmt_status = $conn->prepare($status_sql);
+    $stmt_status->bind_param('i', $admin_id);
+    $stmt_status->execute();
+    $status_result = $stmt_status->get_result();
+} else {
+    // แอดมินและเจ้าของร้านนับทั้งหมด
+    $status_sql = "SELECT status, COUNT(*) as count FROM bookings GROUP BY status";
+    $status_result = $conn->query($status_sql);
+}
 while ($row = $status_result->fetch_assoc()) {
     $status_counts[$row['status']] = $row['count'];
 }

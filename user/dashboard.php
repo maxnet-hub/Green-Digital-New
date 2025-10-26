@@ -127,7 +127,7 @@ $recent_transactions = mysqli_query($conn, $recent_transactions_sql);
                                         <?php while($booking = mysqli_fetch_assoc($recent_bookings)): ?>
                                             <tr>
                                                 <td><?php echo date('d/m/Y', strtotime($booking['booking_date'])); ?></td>
-                                                <td><?php echo date('H:i', strtotime($booking['pickup_time'])); ?></td>
+                                                <td><?php echo date('H:i', strtotime($booking['booking_time'])); ?></td>
                                                 <td>
                                                     <?php if($booking['status'] == 'pending'): ?>
                                                         <span class="badge bg-warning">รอดำเนินการ</span>

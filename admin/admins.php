@@ -58,7 +58,7 @@ $result = $conn->query($sql);
         <!-- ปุ่มเพิ่ม Admin (เฉพาะ Super Admin) -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4>📋 รายการผู้ดูแลระบบ</h4>
-            <?php if($_SESSION['role'] == 'super_admin'): ?>
+            <?php if($_SESSION['role'] == 'admin'): ?>
                 <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addAdminModal">
                     ➕ เพิ่มผู้ดูแลระบบ
                 </button>
@@ -91,10 +91,12 @@ $result = $conn->query($sql);
                             <td><?php echo htmlspecialchars($admin['full_name']); ?></td>
                             <td><?php echo htmlspecialchars($admin['email']); ?></td>
                             <td>
-                                <?php if($admin['role'] == 'super_admin'): ?>
-                                    <span class="badge bg-purple text-white">Super Admin</span>
+                                <?php if($admin['role'] == 'admin'): ?>
+                                    <span class="badge bg-purple text-white">แอดมิน</span>
+                                <?php elseif($admin['role'] == 'owner'): ?>
+                                    <span class="badge bg-success">เจ้าของร้าน</span>
                                 <?php else: ?>
-                                    <span class="badge bg-success">Admin</span>
+                                    <span class="badge bg-info">พนักงาน</span>
                                 <?php endif; ?>
                             </td>
                             <td><?php echo date('d/m/Y H:i', strtotime($admin['created_at'])); ?></td>
@@ -108,7 +110,7 @@ $result = $conn->query($sql);
                                 </button>
 
                                 <!-- ปุ่มแก้ไข (เฉพาะ Super Admin) -->
-                                <?php if($_SESSION['role'] == 'super_admin'): ?>
+                                <?php if($_SESSION['role'] == 'admin'): ?>
                                     <button class="btn btn-warning btn-sm"
                                             data-bs-toggle="modal"
                                             data-bs-target="#editModal<?php echo $admin['admin_id']; ?>"
@@ -173,8 +175,9 @@ $result = $conn->query($sql);
                         <div class="mb-3">
                             <label class="form-label">Role <span class="text-danger">*</span></label>
                             <select name="role" class="form-select" required>
-                                <option value="admin">Admin</option>
-                                <option value="super_admin">Super Admin</option>
+                                <option value="staff">พนักงาน</option>
+                                <option value="owner">เจ้าของร้าน</option>
+                                <option value="admin">แอดมิน</option>
                             </select>
                         </div>
                     </div>
@@ -222,10 +225,12 @@ $result = $conn->query($sql);
                         <tr>
                             <th>Role:</th>
                             <td>
-                                <?php if($admin['role'] == 'super_admin'): ?>
-                                    <span class="badge bg-purple text-white">Super Admin</span>
+                                <?php if($admin['role'] == 'admin'): ?>
+                                    <span class="badge bg-purple text-white">แอดมิน</span>
+                                <?php elseif($admin['role'] == 'owner'): ?>
+                                    <span class="badge bg-success">เจ้าของร้าน</span>
                                 <?php else: ?>
-                                    <span class="badge bg-success">Admin</span>
+                                    <span class="badge bg-info">พนักงาน</span>
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -283,8 +288,9 @@ $result = $conn->query($sql);
                         <div class="mb-3">
                             <label class="form-label">Role <span class="text-danger">*</span></label>
                             <select name="role" class="form-select" required>
-                                <option value="admin" <?php echo $admin['role'] == 'admin' ? 'selected' : ''; ?>>Admin</option>
-                                <option value="super_admin" <?php echo $admin['role'] == 'super_admin' ? 'selected' : ''; ?>>Super Admin</option>
+                                <option value="staff" <?php echo $admin['role'] == 'staff' ? 'selected' : ''; ?>>พนักงาน</option>
+                                <option value="owner" <?php echo $admin['role'] == 'owner' ? 'selected' : ''; ?>>เจ้าของร้าน</option>
+                                <option value="admin" <?php echo $admin['role'] == 'admin' ? 'selected' : ''; ?>>แอดมิน</option>
                             </select>
                         </div>
                     </div>

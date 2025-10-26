@@ -1,8 +1,8 @@
 <?php
 require_once '../../config.php';
 
-// ตรวจสอบว่า login และเป็น Super Admin
-if (!isset($_SESSION['admin_id']) || $_SESSION['role'] != 'super_admin') {
+// ตรวจสอบว่า login และเป็น แอดมิน
+if (!isset($_SESSION['admin_id']) || $_SESSION['role'] != 'admin') {
     header('Location: ../../login.php');
     exit();
 }

@@ -76,3 +76,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     header("Location: ../user_register.php");
     exit();
 }
+?>

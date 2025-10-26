@@ -286,15 +286,15 @@
             <h2>📊 สรุปโครงสร้างฐานข้อมูล</h2>
             <div class="stats">
                 <div class="stat-box">
-                    <div class="stat-number">14</div>
+                    <div class="stat-number">15</div>
                     <div>ตาราง (Tables)</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-number">150+</div>
+                    <div class="stat-number">160+</div>
                     <div>ฟิลด์ (Fields)</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-number">10+</div>
+                    <div class="stat-number">12+</div>
                     <div>ความสัมพันธ์ (Relations)</div>
                 </div>
             </div>
@@ -380,10 +380,10 @@
                         <td>ระดับ: Bronze, Silver, Gold</td>
                     </tr>
                     <tr>
-                        <td class="field-name">total_points</td>
+                        <td class="field-name">points</td>
                         <td class="data-type">INT</td>
                         <td></td>
-                        <td>แต้มสะสมทั้งหมด</td>
+                        <td>แต้มสะสมปัจจุบัน (100 บาท = 1 แต้ม)</td>
                     </tr>
                     <tr>
                         <td class="field-name">status</td>
@@ -845,13 +845,13 @@
             </table>
         </div>
 
-        <!-- 8. User Points Table -->
+        <!-- 8. User Points Table (เก่า - จะถูกแทนที่ด้วย point_transactions) -->
         <div class="table-card">
             <div class="table-header color-indigo">
                 <span>🎮</span>
                 <div>
                     <h3>user_points</h3>
-                    <p class="table-desc">ประวัติการได้รับแต้มสะสม</p>
+                    <p class="table-desc">ประวัติการได้รับแต้มสะสม (เก่า - แนะนำให้ใช้ point_transactions แทน)</p>
                 </div>
             </div>
             <table>
@@ -911,6 +911,77 @@
                         <td class="data-type">DATETIME</td>
                         <td></td>
                         <td>วันที่ได้รับ</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 8.1 Point Transactions Table (ใหม่) -->
+        <div class="table-card">
+            <div class="table-header color-indigo">
+                <span>💎</span>
+                <div>
+                    <h3>point_transactions</h3>
+                    <p class="table-desc">ประวัติการทำรายการแต้มสะสม (ระบบใหม่)</p>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ฟิลด์</th>
+                        <th>ชนิดข้อมูล</th>
+                        <th>คีย์</th>
+                        <th>คำอธิบาย</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="field-name">transaction_id</td>
+                        <td class="data-type">INT</td>
+                        <td><span class="key-badge pk">PK</span></td>
+                        <td>รหัสรายการแต้ม</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">user_id</td>
+                        <td class="data-type">INT</td>
+                        <td><span class="key-badge fk">FK</span></td>
+                        <td>ผู้ใช้ → users</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">booking_id</td>
+                        <td class="data-type">INT</td>
+                        <td><span class="key-badge fk">FK</span></td>
+                        <td>จากการจอง → bookings (NULL ได้)</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">points</td>
+                        <td class="data-type">INT</td>
+                        <td></td>
+                        <td>จำนวนแต้ม (+ คือได้รับ, - คือใช้)</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">amount</td>
+                        <td class="data-type">DECIMAL(10,2)</td>
+                        <td></td>
+                        <td>ยอดเงินที่ใช้คำนวณ (ถ้ามี)</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">transaction_type</td>
+                        <td class="data-type">ENUM</td>
+                        <td></td>
+                        <td>ประเภท: earn, redeem, adjustment</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">description</td>
+                        <td class="data-type">TEXT</td>
+                        <td></td>
+                        <td>คำอธิบายรายการ</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">created_at</td>
+                        <td class="data-type">DATETIME</td>
+                        <td></td>
+                        <td>วันที่ทำรายการ</td>
                     </tr>
                 </tbody>
             </table>

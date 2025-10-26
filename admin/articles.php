@@ -85,7 +85,7 @@ if (!$result) {
                                     <tr>
                                         <td>
                                             <?php if($article['image_url']): ?>
-                                                <img src="<?php echo $article['image_url']; ?>" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
+                                                <img src="<?php echo "../" . $article['image_url']; ?>" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
                                             <?php else: ?>
                                                 <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">📄</div>
                                             <?php endif; ?>
@@ -122,7 +122,7 @@ if (!$result) {
                                                 </div>
                                                 <div class="modal-body">
                                                     <?php if($article['image_url']): ?>
-                                                        <img src="<?php echo $article['image_url']; ?>" class="img-fluid mb-3">
+                                                        <img src="<?php echo "../" .$article['image_url']; ?>" class="img-fluid mb-3">
                                                     <?php endif; ?>
                                                     <h4><?php echo htmlspecialchars($article['title']); ?></h4>
                                                     <p class="text-muted">
@@ -172,7 +172,7 @@ if (!$result) {
                                                             <label class="form-label">รูปภาพ (ไม่เลือกหากไม่ต้องการเปลี่ยน)</label>
                                                             <?php if($article['image_url']): ?>
                                                                 <div class="mb-2">
-                                                                    <img src="<?php echo $article['image_url']; ?>" class="img-thumbnail" style="max-height: 150px;">
+                                                                    <img src="<?php echo "../" .$article['image_url']; ?>" class="img-thumbnail" style="max-height: 150px;">
                                                                 </div>
                                                             <?php endif; ?>
                                                             <input type="file" name="image" class="form-control" accept="image/*">

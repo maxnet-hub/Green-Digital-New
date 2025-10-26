@@ -37,23 +37,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // สร้างชื่อไฟล์ใหม่
             $newname = 'article_' . time() . '_' . uniqid() . '.' . $filetype;
-            $upload_path = '../../uploads/articles/';
-
-            // สร้างโฟลเดอร์ถ้ายังไม่มี
-            if (!file_exists($upload_path)) {
-                mkdir($upload_path, 0777, true);
-            }
 
             // อัปโหลดไฟล์
             if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_path . $newname)) {
-                $image_url = '/uploads/articles/' . $newname;
+                $image_url = 'uploads/articles/' . $newname;
             }
         }
     }
 
     // อัปเดตบทความ
     $sql = "UPDATE articles
-            SET title = '$title', category = '$category', content = '$content', image_url = '$image_url', status = '$status', updated_at = NOW()
+            SET title = '$title', category = '$category', content = '$content', image_url = '$image_url', status = '$status'
             WHERE article_id = '$article_id'";
 
     $result = mysqli_query($conn, $sql);

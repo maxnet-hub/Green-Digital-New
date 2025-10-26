@@ -16,7 +16,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="users.php">👥 จัดการสมาชิก</a>
                 </li>
-                <?php if ($_SESSION['role'] === 'super_admin'): ?>
+                <?php if ($_SESSION['role'] === 'admin'): ?>
                 <li class="nav-item">
                     <a class="nav-link" href="admins.php">👨‍💼 จัดการผู้ดูแล</a>
                 </li>
