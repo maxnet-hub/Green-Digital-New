@@ -11,7 +11,7 @@ $admin_id = $_SESSION['admin_id'];
 $booking_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 // ดึงข้อมูลการจอง
-$booking_sql = "SELECT b.*,
+$booking_result = mysqli_query($conn, "SELECT b.*,
                 u.first_name, u.last_name, u.phone, u.email, u.address as user_address, u.user_level,
                 a.full_name as assigned_name,
                 (SELECT SUM(quantity) FROM booking_items WHERE booking_id = b.booking_id) as total_weight,
@@ -19,19 +19,15 @@ $booking_sql = "SELECT b.*,
                 FROM bookings b
                 JOIN users u ON b.user_id = u.user_id
                 LEFT JOIN admins a ON b.assigned_to = a.admin_id
-                WHERE b.booking_id = ?";
-$stmt = $conn->prepare($booking_sql);
-$stmt->bind_param('i', $booking_id);
-$stmt->execute();
-$booking_result = $stmt->get_result();
+                WHERE b.booking_id = $booking_id");
 
-if (!$booking_result || $booking_result->num_rows == 0) {
+if (!$booking_result || mysqli_num_rows($booking_result) == 0) {
     $_SESSION['error'] = 'ไม่พบการจองนี้';
     header("Location: bookings.php");
     exit();
 }
 
-$booking = $booking_result->fetch_assoc();
+$booking = mysqli_fetch_assoc($booking_result);
 
 // ตรวจสอบสิทธิ์การเข้าถึง: พนักงานเห็นเฉพาะงานที่ได้รับมอบหมาย
 if ($_SESSION['role'] == 'staff') {
@@ -43,19 +39,15 @@ if ($_SESSION['role'] == 'staff') {
 }
 
 // ดึงรายการขยะในการจอง
-$items_sql = "SELECT bi.*, rt.type_name, rt.category, rt.co2_reduction
+$items = mysqli_query($conn, "SELECT bi.*, rt.type_name, rt.category, rt.co2_reduction
               FROM booking_items bi
               JOIN recycle_types rt ON bi.type_id = rt.type_id
-              WHERE bi.booking_id = ?";
-$stmt = $conn->prepare($items_sql);
-$stmt->bind_param('i', $booking_id);
-$stmt->execute();
-$items = $stmt->get_result();
+              WHERE bi.booking_id = $booking_id");
 
 // คำนวณ CO2
 $total_co2 = 0;
-if ($items->num_rows > 0) {
-    $items_data = $items->fetch_all(MYSQLI_ASSOC);
+if (mysqli_num_rows($items) > 0) {
+    $items_data = mysqli_fetch_all($items, MYSQLI_ASSOC);
     foreach ($items_data as $item) {
         $total_co2 += $item['quantity'] * $item['co2_reduction'];
     }
@@ -64,27 +56,21 @@ if ($items->num_rows > 0) {
 // ดึงข้อมูล transaction ถ้ามี
 $transaction = null;
 if ($booking['status'] == 'completed') {
-    $trans_sql = "SELECT * FROM transactions WHERE booking_id = ? LIMIT 1";
-    $stmt = $conn->prepare($trans_sql);
-    $stmt->bind_param('i', $booking_id);
-    $stmt->execute();
-    $trans_result = $stmt->get_result();
-    if ($trans_result && $trans_result->num_rows > 0) {
-        $transaction = $trans_result->fetch_assoc();
+    $trans_result = mysqli_query($conn, "SELECT * FROM transactions WHERE booking_id = $booking_id LIMIT 1");
+    if ($trans_result && mysqli_num_rows($trans_result) > 0) {
+        $transaction = mysqli_fetch_assoc($trans_result);
     }
 }
 
 // ดึงรายชื่อ admin ทั้งหมด
-$admins_sql = "SELECT admin_id, full_name, role FROM admins ORDER BY full_name";
-$admins = $conn->query($admins_sql);
+$admins = mysqli_query($conn, "SELECT admin_id, full_name, role FROM admins ORDER BY full_name");
 
 // ดึงประเภทขยะทั้งหมดสำหรับ dropdown เพิ่มรายการ (JOIN กับ prices)
-$recycle_types_sql = "SELECT rt.type_id, rt.type_name, rt.category, p.price_per_kg
+$recycle_types = mysqli_query($conn, "SELECT rt.type_id, rt.type_name, rt.category, p.price_per_kg
                       FROM recycle_types rt
                       LEFT JOIN prices p ON rt.type_id = p.type_id AND p.is_current = TRUE
                       WHERE rt.status = 'active'
-                      ORDER BY rt.category, rt.type_name";
-$recycle_types = $conn->query($recycle_types_sql);
+                      ORDER BY rt.category, rt.type_name");
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -333,9 +319,9 @@ $recycle_types = $conn->query($recycle_types_sql);
                                             <select name="type_id" class="form-select" required>
                                                 <option value="">-- เลือกประเภทขยะ --</option>
                                                 <?php
-                                                if ($recycle_types && $recycle_types->num_rows > 0):
-                                                    $recycle_types->data_seek(0);
-                                                    while ($type = $recycle_types->fetch_assoc()):
+                                                if ($recycle_types && mysqli_num_rows($recycle_types) > 0):
+                                                    mysqli_data_seek($recycle_types, 0);
+                                                    while ($type = mysqli_fetch_assoc($recycle_types)):
                                                 ?>
                                                     <option value="<?php echo $type['type_id']; ?>">
                                                         [<?php echo htmlspecialchars($type['category']); ?>]
@@ -377,9 +363,9 @@ $recycle_types = $conn->query($recycle_types_sql);
                                             <select name="type_id" class="form-select" required>
                                                 <option value="">-- เลือกประเภทขยะ --</option>
                                                 <?php
-                                                if ($recycle_types && $recycle_types->num_rows > 0):
-                                                    $recycle_types->data_seek(0);
-                                                    while ($type = $recycle_types->fetch_assoc()):
+                                                if ($recycle_types && mysqli_num_rows($recycle_types) > 0):
+                                                    mysqli_data_seek($recycle_types, 0);
+                                                    while ($type = mysqli_fetch_assoc($recycle_types)):
                                                 ?>
                                                     <option value="<?php echo $type['type_id']; ?>">
                                                         [<?php echo htmlspecialchars($type['category']); ?>]
@@ -494,8 +480,8 @@ $recycle_types = $conn->query($recycle_types_sql);
                                 <select name="assigned_to" class="form-select">
                                     <option value="">ไม่มี</option>
                                     <?php
-                                    $admins->data_seek(0);
-                                    while ($admin = $admins->fetch_assoc()):
+                                    mysqli_data_seek($admins, 0);
+                                    while ($admin = mysqli_fetch_assoc($admins)):
                                     ?>
                                         <option value="<?php echo $admin['admin_id']; ?>"
                                                 <?php echo $booking['assigned_to'] == $admin['admin_id'] ? 'selected' : ''; ?>>

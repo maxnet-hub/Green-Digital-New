@@ -15,11 +15,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $address = $_POST['address'];
     $province = $_POST['province'];
     $district = $_POST['district'];
+    $security_answer = $_POST['security_answer'];
 
     // เช็คค่า NULL
     if (empty($email) || empty($password) || empty($confirm_password) ||
         empty($first_name) || empty($last_name) || empty($phone) ||
-        empty($address) || empty($province) || empty($district)) {
+        empty($address) || empty($province) || empty($district) || empty($security_answer)) {
         $_SESSION['error'] = "กรุณากรอกข้อมูลให้ครบถ้วน";
         header("Location: ../user_register.php");
         exit();
@@ -53,8 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     // บันทึกข้อมูล
-    $sql = "INSERT INTO users (email, password, first_name, last_name, phone, address, province, district, user_level, total_points, status)
-            VALUES ('$email', '$hashed_password', '$first_name', '$last_name', '$phone', '$address', '$province', '$district', 'Bronze', 0, 'active')";
+    $sql = "INSERT INTO users (email, password, first_name, last_name, phone, address, province, district, security_answer, user_level, total_points, status)
+            VALUES ('$email', '$hashed_password', '$first_name', '$last_name', '$phone', '$address', '$province', '$district', '$security_answer', 'Bronze', 0, 'active')";
 
     $result = mysqli_query($conn, $sql);
 

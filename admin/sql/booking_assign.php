@@ -13,29 +13,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $assigned_to = isset($_POST['assigned_to']) && $_POST['assigned_to'] != '' ? intval($_POST['assigned_to']) : null;
 
     // ตรวจสอบว่าการจองมีอยู่จริง
-    $check_sql = "SELECT * FROM bookings WHERE booking_id = ?";
-    $stmt = $conn->prepare($check_sql);
-    $stmt->bind_param('i', $booking_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $check_sql = "SELECT * FROM bookings WHERE booking_id = $booking_id";
+    $result = mysqli_query($conn, $check_sql);
 
-    if ($result->num_rows == 0) {
+    if (mysqli_num_rows($result) == 0) {
         $_SESSION['error'] = 'ไม่พบการจองนี้';
         header("Location: ../bookings.php");
         exit();
     }
 
-    $booking = $result->fetch_assoc();
+    $booking = mysqli_fetch_assoc($result);
 
     // ตรวจสอบว่า admin ที่จะมอบหมายมีอยู่จริง (ถ้าระบุ)
     if ($assigned_to !== null) {
-        $admin_check_sql = "SELECT * FROM admins WHERE admin_id = ?";
-        $stmt = $conn->prepare($admin_check_sql);
-        $stmt->bind_param('i', $assigned_to);
-        $stmt->execute();
-        $admin_result = $stmt->get_result();
+        $admin_check_sql = "SELECT * FROM admins WHERE admin_id = $assigned_to";
+        $admin_result = mysqli_query($conn, $admin_check_sql);
 
-        if ($admin_result->num_rows == 0) {
+        if (mysqli_num_rows($admin_result) == 0) {
             $_SESSION['error'] = 'ไม่พบผู้ดูแลระบบนี้';
             header("Location: ../booking_detail.php?id=$booking_id");
             exit();
@@ -44,16 +38,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // อัพเดทการมอบหมาย
     if ($assigned_to !== null) {
-        $update_sql = "UPDATE bookings SET assigned_to = ?, updated_at = NOW() WHERE booking_id = ?";
-        $stmt = $conn->prepare($update_sql);
-        $stmt->bind_param('ii', $assigned_to, $booking_id);
+        $update_sql = "UPDATE bookings SET assigned_to = $assigned_to, updated_at = NOW() WHERE booking_id = $booking_id";
     } else {
-        $update_sql = "UPDATE bookings SET assigned_to = NULL, updated_at = NOW() WHERE booking_id = ?";
-        $stmt = $conn->prepare($update_sql);
-        $stmt->bind_param('i', $booking_id);
+        $update_sql = "UPDATE bookings SET assigned_to = NULL, updated_at = NOW() WHERE booking_id = $booking_id";
     }
 
-    if ($stmt->execute()) {
+    $result = mysqli_query($conn, $update_sql);
+
+    if ($result) {
         $_SESSION['success'] = 'มอบหมายงานสำเร็จ';
     } else {
         $_SESSION['error'] = 'ไม่สามารถมอบหมายงานได้';

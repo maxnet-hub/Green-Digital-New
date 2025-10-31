@@ -9,7 +9,7 @@ if (!isset($_SESSION['admin_id'])) {
 
 // Query ข้อมูล Admin ทั้งหมด
 $sql = "SELECT * FROM admins ORDER BY created_at DESC";
-$result = $conn->query($sql);
+$result = mysqli_query($conn, $sql);
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -37,6 +37,8 @@ $result = $conn->query($sql);
                     if($_GET['success'] == 'added') echo 'เพิ่มผู้ดูแลสำเร็จ!';
                     if($_GET['success'] == 'updated') echo 'แก้ไขข้อมูลสำเร็จ!';
                     if($_GET['success'] == 'deleted') echo 'ลบผู้ดูแลสำเร็จ!';
+                    if($_GET['success'] == 'suspended') echo 'ระงับสิทธิ์สำเร็จ!';
+                    if($_GET['success'] == 'unsuspended') echo 'ยกเลิกระงับสิทธิ์สำเร็จ!';
                 ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
@@ -49,6 +51,7 @@ $result = $conn->query($sql);
                     if($_GET['error'] == 'username_exists') echo 'Username นี้มีอยู่ในระบบแล้ว!';
                     if($_GET['error'] == 'password_mismatch') echo 'รหัสผ่านไม่ตรงกัน!';
                     if($_GET['error'] == 'delete_self') echo 'ไม่สามารถลบตัวเองได้!';
+                    if($_GET['error'] == 'suspend_self') echo 'ไม่สามารถระงับสิทธิ์ตัวเองได้!';
                     if($_GET['error'] == 'failed') echo 'ดำเนินการไม่สำเร็จ กรุณาลองใหม่!';
                 ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -72,18 +75,19 @@ $result = $conn->query($sql);
                     <thead class="table-light">
                         <tr>
                             <th width="5%">#</th>
-                            <th width="15%">Username</th>
-                            <th width="20%">ชื่อ-นามสกุล</th>
-                            <th width="20%">Email</th>
-                            <th width="12%">Role</th>
-                            <th width="15%">วันที่สร้าง</th>
-                            <th width="13%" class="text-center">จัดการ</th>
+                            <th width="13%">Username</th>
+                            <th width="18%">ชื่อ-นามสกุล</th>
+                            <th width="18%">Email</th>
+                            <th width="10%">Role</th>
+                            <th width="12%">สถานะ</th>
+                            <th width="12%">วันที่สร้าง</th>
+                            <th width="12%" class="text-center">จัดการ</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
                         $no = 1;
-                        while($admin = $result->fetch_assoc()):
+                        while($admin = mysqli_fetch_assoc($result)):
                         ?>
                         <tr>
                             <td><?php echo $no++; ?></td>
@@ -97,6 +101,13 @@ $result = $conn->query($sql);
                                     <span class="badge bg-success">เจ้าของร้าน</span>
                                 <?php else: ?>
                                     <span class="badge bg-info">พนักงาน</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?php if(isset($admin['status']) && $admin['status'] == 'suspended'): ?>
+                                    <span class="badge bg-danger">ระงับการใช้งาน</span>
+                                <?php else: ?>
+                                    <span class="badge bg-success">ใช้งานได้</span>
                                 <?php endif; ?>
                             </td>
                             <td><?php echo date('d/m/Y H:i', strtotime($admin['created_at'])); ?></td>
@@ -118,8 +129,23 @@ $result = $conn->query($sql);
                                         ✏️
                                     </button>
 
-                                    <!-- ปุ่มลบ (ไม่ให้ลบตัวเอง) -->
+                                    <!-- ปุ่มระงับสิทธิ์ (ไม่ให้ระงับตัวเอง) -->
                                     <?php if($admin['admin_id'] != $_SESSION['admin_id']): ?>
+                                        <?php if(isset($admin['status']) && $admin['status'] == 'suspended'): ?>
+                                            <button class="btn btn-success btn-sm"
+                                                    onclick="suspendAdmin(<?php echo $admin['admin_id']; ?>, '<?php echo htmlspecialchars($admin['username']); ?>', 'unsuspend')"
+                                                    title="ยกเลิกระงับสิทธิ์">
+                                                ✅
+                                            </button>
+                                        <?php else: ?>
+                                            <button class="btn btn-warning btn-sm"
+                                                    onclick="suspendAdmin(<?php echo $admin['admin_id']; ?>, '<?php echo htmlspecialchars($admin['username']); ?>', 'suspend')"
+                                                    title="ระงับสิทธิ์">
+                                                ⛔
+                                            </button>
+                                        <?php endif; ?>
+
+                                        <!-- ปุ่มลบ -->
                                         <button class="btn btn-danger btn-sm"
                                                 onclick="deleteAdmin(<?php echo $admin['admin_id']; ?>, '<?php echo htmlspecialchars($admin['username']); ?>')"
                                                 title="ลบ">
@@ -193,7 +219,7 @@ $result = $conn->query($sql);
     <!-- ========== Loop Modal แก้ไข + Modal ดู (แยกตาม admin_id) ========== -->
     <?php
     $result->data_seek(0); // Reset pointer
-    while($admin = $result->fetch_assoc()):
+    while($admin = mysqli_fetch_assoc($result)):
     ?>
 
     <!-- Modal ดูข้อมูล -->
@@ -307,6 +333,19 @@ $result = $conn->query($sql);
 
     <script src="../js/bootstrap.bundle.min.js"></script>
     <script>
+        function suspendAdmin(id, username, action) {
+            let message = '';
+            if (action === 'suspend') {
+                message = 'คุณแน่ใจว่าต้องการระงับสิทธิ์ของ "' + username + '" ?';
+            } else {
+                message = 'คุณแน่ใจว่าต้องการยกเลิกระงับสิทธิ์ของ "' + username + '" ?';
+            }
+
+            if (confirm(message)) {
+                window.location.href = 'sql/admin_suspend.php?id=' + id + '&action=' + action;
+            }
+        }
+
         function deleteAdmin(id, username) {
             if (confirm('คุณแน่ใจว่าต้องการลบผู้ดูแล "' + username + '" ?\n\nการกระทำนี้ไม่สามารถย้อนกลับได้!')) {
                 window.location.href = 'sql/admin_delete.php?id=' + id;

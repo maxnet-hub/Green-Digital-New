@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Demo - เพิ่มสินค้า</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .form-card {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .preview-container {
+            margin-top: 10px;
+        }
+
+        .required-label::after {
+            content: " *";
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="bi bi-shop"></i> Shop Demo
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">หน้าแรก</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">สินค้า</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">เกี่ยวกับ</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="bg-light py-4 mb-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <h1 class="display-5 mb-0">
+                        <i class="bi bi-plus-circle"></i> เพิ่มสินค้าใหม่
+                    </h1>
+                    <nav aria-label="breadcrumb" class="mt-2">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="index.html">หน้าแรก</a></li>
+                            <li class="breadcrumb-item"><a href="index.html">สินค้า</a></li>
+                            <li class="breadcrumb-item active">เพิ่มสินค้า</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Section -->
+    <div class="container mb-5">
+        <div class="card form-card shadow">
+            <div class="card-body p-4">
+                <form id="addProductForm" novalidate>
+                    <!-- Product Name -->
+                    <div class="mb-3">
+                        <label for="productName" class="form-label required-label">ชื่อสินค้า</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-box-seam"></i>
+                            </span>
+                            <input type="text" class="form-control" id="productName" name="productName"
+                                   placeholder="กรุณากรอกชื่อสินค้า" required minlength="3">
+                            <div class="invalid-feedback">
+                                กรุณากรอกชื่อสินค้า (อย่างน้อย 3 ตัวอักษร)
+                            </div>
+                        </div>
+                        <div class="form-text">ตัวอย่าง: โทรศัพท์มือถือ, แล็ปท็อป, หูฟังไร้สาย</div>
+                    </div>
+
+                    <!-- Price and Quantity Row -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="price" class="form-label required-label">ราคา (บาท)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-currency-dollar"></i>
+                                    </span>
+                                    <input type="number" class="form-control" id="price" name="price"
+                                           placeholder="0.00" required min="0" step="0.01">
+                                    <span class="input-group-text">บาท</span>
+                                    <div class="invalid-feedback">
+                                        กรุณากรอกราคาสินค้า (มากกว่า 0)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="quantity" class="form-label required-label">จำนวนสินค้า</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-box"></i>
+                                    </span>
+                                    <input type="number" class="form-control" id="quantity" name="quantity"
+                                           placeholder="0" required min="0" step="1">
+                                    <span class="input-group-text">ชิ้น</span>
+                                    <div class="invalid-feedback">
+                                        กรุณากรอกจำนวนสินค้า (0 หรือมากกว่า)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="mb-3">
+                        <label for="category" class="form-label required-label">หมวดหมู่สินค้า</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-tag"></i>
+                            </span>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="" selected disabled>-- เลือกหมวดหมู่ --</option>
+                                <option value="electronics">อิเล็กทรอนิกส์</option>
+                                <option value="computers">คอมพิวเตอร์</option>
+                                <option value="accessories">อุปกรณ์เสริม</option>
+                                <option value="audio">เครื่องเสียง</option>
+                                <option value="cameras">กล้อง</option>
+                                <option value="wearables">อุปกรณ์สวมใส่</option>
+                                <option value="gaming">เกมมิ่ง</option>
+                                <option value="other">อื่นๆ</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                กรุณาเลือกหมวดหมู่สินค้า
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label for="description" class="form-label required-label">รายละเอียดสินค้า</label>
+                        <textarea class="form-control" id="description" name="description" rows="4"
+                                  placeholder="กรุณากรอกรายละเอียดสินค้า" required minlength="10"></textarea>
+                        <div class="invalid-feedback">
+                            กรุณากรอกรายละเอียดสินค้า (อย่างน้อย 10 ตัวอักษร)
+                        </div>
+                        <div class="form-text">อธิบายคุณสมบัติ ข้อดี และรายละเอียดสินค้าของคุณ</div>
+                    </div>
+
+                    <!-- Image URL -->
+                    <div class="mb-3">
+                        <label for="imageUrl" class="form-label">URL รูปภาพสินค้า</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-image"></i>
+                            </span>
+                            <input type="url" class="form-control" id="imageUrl" name="imageUrl"
+                                   placeholder="https://example.com/image.jpg">
+                        </div>
+                        <div class="form-text">
+                            ใส่ URL รูปภาพหรือทิ้งว่างไว้เพื่อใช้รูปภาพเริ่มต้น
+                            <button type="button" class="btn btn-link btn-sm p-0" onclick="useExampleImage()">
+                                ใช้รูปภาพตัวอย่าง
+                            </button>
+                        </div>
+                        <!-- Image Preview -->
+                        <div class="preview-container">
+                            <img id="imagePreview" class="preview-image" alt="ตัวอย่างรูปภาพ">
+                        </div>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="mb-4">
+                        <label class="form-label">สถานะสินค้า</label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="inStock" name="inStock" checked>
+                            <label class="form-check-label" for="inStock">
+                                <span id="stockLabel">
+                                    <i class="bi bi-check-circle text-success"></i> มีสินค้า
+                                </span>
+                            </label>
+                        </div>
+                        <div class="form-text">เปิด/ปิด สถานะความพร้อมของสินค้า</div>
+                    </div>
+
+                    <!-- Alert Info -->
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>หมายเหตุ:</strong> นี่เป็นเพียงหน้า Demo เท่านั้น ข้อมูลจะไม่ถูกบันทึกลงฐานข้อมูลจริง
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="index.html" class="btn btn-secondary btn-lg">
+                            <i class="bi bi-x-circle"></i> ยกเลิก
+                        </a>
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-check-circle"></i> บันทึกสินค้า
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 Shop Demo - ระบบจัดการสินค้าตัวอย่าง</p>
+            <p class="text-muted small mb-0">สำหรับการเรียนรู้และทดสอบเท่านั้น</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        // Form Validation
+        const form = document.getElementById('addProductForm');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (form.checkValidity()) {
+                // Collect form data
+                const formData = {
+                    productName: document.getElementById('productName').value,
+                    price: document.getElementById('price').value,
+                    quantity: document.getElementById('quantity').value,
+                    category: document.getElementById('category').value,
+                    description: document.getElementById('description').value,
+                    imageUrl: document.getElementById('imageUrl').value,
+                    inStock: document.getElementById('inStock').checked
+                };
+
+                // Show success message
+                alert('✅ บันทึกสินค้าสำเร็จ!\n\n' +
+                      'ชื่อสินค้า: ' + formData.productName + '\n' +
+                      'ราคา: ฿' + parseFloat(formData.price).toLocaleString() + '\n' +
+                      'จำนวน: ' + formData.quantity + ' ชิ้น\n' +
+                      'หมวดหมู่: ' + document.getElementById('category').options[document.getElementById('category').selectedIndex].text + '\n\n' +
+                      '(นี่เป็นเพียง Demo ข้อมูลจะไม่ถูกบันทึกจริง)');
+
+                // Redirect to index page
+                window.location.href = 'index.html';
+            } else {
+                form.classList.add('was-validated');
+            }
+        });
+
+        // Image Preview
+        const imageUrlInput = document.getElementById('imageUrl');
+        const imagePreview = document.getElementById('imagePreview');
+
+        imageUrlInput.addEventListener('input', function() {
+            const url = this.value;
+            if (url && isValidUrl(url)) {
+                imagePreview.src = url;
+                imagePreview.style.display = 'block';
+            } else {
+                imagePreview.style.display = 'none';
+            }
+        });
+
+        // Validate URL
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        // Use example image
+        function useExampleImage() {
+            const exampleUrl = 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop';
+            document.getElementById('imageUrl').value = exampleUrl;
+            imagePreview.src = exampleUrl;
+            imagePreview.style.display = 'block';
+        }
+
+        // Toggle stock status label
+        const inStockCheckbox = document.getElementById('inStock');
+        const stockLabel = document.getElementById('stockLabel');
+
+        inStockCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                stockLabel.innerHTML = '<i class="bi bi-check-circle text-success"></i> มีสินค้า';
+            } else {
+                stockLabel.innerHTML = '<i class="bi bi-x-circle text-danger"></i> สินค้าหมด';
+            }
+        });
+
+        // Auto-format price with comma
+        const priceInput = document.getElementById('price');
+        priceInput.addEventListener('blur', function() {
+            if (this.value) {
+                const price = parseFloat(this.value);
+                if (!isNaN(price)) {
+                    this.value = price.toFixed(2);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

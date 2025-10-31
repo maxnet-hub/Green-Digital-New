@@ -7,16 +7,36 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-// Query บทความทั้งหมด
-$sql = "SELECT a.*, ad.full_name as author_name
+// รับค่าการค้นหา
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+
+// Query บทความทั้งหมด พร้อมคำนวณสถานะแสดงผล
+$sql = "SELECT a.*, ad.full_name as author_name,
+        CASE
+            WHEN a.status = 'draft' THEN 'draft'
+            WHEN NOW() < a.published_start THEN 'scheduled'
+            WHEN a.published_end IS NOT NULL AND NOW() > a.published_end THEN 'expired'
+            ELSE 'active'
+        END as display_status
         FROM articles a
         LEFT JOIN admins ad ON a.author_id = ad.admin_id
-        ORDER BY a.created_at DESC";
-$result = $conn->query($sql);
+        WHERE 1=1";
+
+// เพิ่มเงื่อนไขการค้นหา
+if (!empty($search)) {
+    $search_escaped = $conn->real_escape_string($search);
+    $sql .= " AND (a.title LIKE '%$search_escaped%'
+              OR a.content LIKE '%$search_escaped%'
+              OR a.category LIKE '%$search_escaped%'
+              OR ad.full_name LIKE '%$search_escaped%')";
+}
+
+$sql .= " ORDER BY a.created_at DESC";
+$result = mysqli_query($conn, $sql);
 
 // ตรวจสอบว่า query สำเร็จหรือไม่
 if (!$result) {
-    die("Error in query: " . $conn->error);
+    die("Error in query: " . mysqli_error($conn));
 }
 ?>
 <!DOCTYPE html>
@@ -63,6 +83,21 @@ if (!$result) {
             </button>
         </div>
 
+        <!-- Search Box -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <form method="GET" action="">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="ค้นหา: หัวข้อ, เนื้อหา, หมวดหมู่, ผู้เขียน..." value="<?php echo htmlspecialchars($search); ?>">
+                        <button type="submit" class="btn btn-primary">🔍 ค้นหา</button>
+                        <?php if(!empty($search)): ?>
+                            <a href="articles.php" class="btn btn-secondary">ล้าง</a>
+                        <?php endif; ?>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Articles Table -->
         <div class="card">
             <div class="card-body">
@@ -74,14 +109,14 @@ if (!$result) {
                                 <th>หัวข้อ</th>
                                 <th>หมวดหมู่</th>
                                 <th>ผู้เขียน</th>
-                                <th width="120">สถานะ</th>
-                                <th width="120">วันที่สร้าง</th>
+                                <th width="140">สถานะแสดงผล</th>
+                                <th width="180">ช่วงเวลาแสดง</th>
                                 <th width="150" class="text-center">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if($result->num_rows > 0): ?>
-                                <?php while($article = $result->fetch_assoc()): ?>
+                            <?php if(mysqli_num_rows($result) > 0): ?>
+                                <?php while($article = mysqli_fetch_assoc($result)): ?>
                                     <tr>
                                         <td>
                                             <?php if($article['image_url']): ?>
@@ -98,13 +133,40 @@ if (!$result) {
                                         </td>
                                         <td><?php echo $article['author_name']; ?></td>
                                         <td>
+                                            <?php
+                                            switch($article['display_status']) {
+                                                case 'active':
+                                                    echo '<span class="badge bg-success">กำลังแสดง</span>';
+                                                    break;
+                                                case 'scheduled':
+                                                    echo '<span class="badge bg-warning text-dark">รอแสดง</span>';
+                                                    break;
+                                                case 'expired':
+                                                    echo '<span class="badge bg-secondary">หมดอายุ</span>';
+                                                    break;
+                                                case 'draft':
+                                                    echo '<span class="badge bg-secondary">แบบร่าง</span>';
+                                                    break;
+                                            }
+                                            ?>
+                                        </td>
+                                        <td>
                                             <?php if($article['status'] == 'published'): ?>
-                                                <span class="badge bg-success">เผยแพร่แล้ว</span>
+                                                <small>
+                                                    <strong>เริ่ม:</strong> <?php echo date('d/m/Y H:i', strtotime($article['published_start'])); ?><br>
+                                                    <strong>สิ้นสุด:</strong>
+                                                    <?php
+                                                    if($article['published_end']) {
+                                                        echo date('d/m/Y H:i', strtotime($article['published_end']));
+                                                    } else {
+                                                        echo '<span class="text-muted">ไม่จำกัด</span>';
+                                                    }
+                                                    ?>
+                                                </small>
                                             <?php else: ?>
-                                                <span class="badge bg-secondary">แบบร่าง</span>
+                                                <small class="text-muted">-</small>
                                             <?php endif; ?>
                                         </td>
-                                        <td><?php echo date('d/m/Y', strtotime($article['created_at'])); ?></td>
                                         <td class="text-center">
                                             <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal<?php echo $article['article_id']; ?>">👁️</button>
                                             <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $article['article_id']; ?>">✏️</button>
@@ -179,10 +241,34 @@ if (!$result) {
                                                         </div>
                                                         <div class="mb-3">
                                                             <label class="form-label">สถานะ <span class="text-danger">*</span></label>
-                                                            <select name="status" class="form-select" required>
+                                                            <select name="status" class="form-select" id="status_edit_<?php echo $article['article_id']; ?>" required onchange="toggleScheduleFields('edit', <?php echo $article['article_id']; ?>)">
                                                                 <option value="draft" <?php if($article['status']=='draft') echo 'selected'; ?>>แบบร่าง</option>
                                                                 <option value="published" <?php if($article['status']=='published') echo 'selected'; ?>>เผยแพร่</option>
                                                             </select>
+                                                        </div>
+
+                                                        <div id="schedule_fields_edit_<?php echo $article['article_id']; ?>" style="<?php echo $article['status']=='draft' ? 'display:none;' : ''; ?>">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">วันเวลาเริ่มแสดง <span class="text-danger">*</span></label>
+                                                                <input type="datetime-local" name="published_start" class="form-control"
+                                                                    value="<?php echo $article['published_start'] ? date('Y-m-d\TH:i', strtotime($article['published_start'])) : date('Y-m-d\TH:i'); ?>">
+                                                                <small class="text-muted">ถ้าไม่ระบุ จะใช้เวลาปัจจุบัน</small>
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <label class="form-label">วันเวลาสิ้นสุดการแสดง</label>
+                                                                <input type="datetime-local" name="published_end" class="form-control" id="published_end_edit_<?php echo $article['article_id']; ?>"
+                                                                    value="<?php echo $article['published_end'] ? date('Y-m-d\TH:i', strtotime($article['published_end'])) : ''; ?>"
+                                                                    <?php echo !$article['published_end'] ? 'disabled' : ''; ?>>
+                                                                <div class="form-check mt-2">
+                                                                    <input class="form-check-input" type="checkbox" id="no_expiry_edit_<?php echo $article['article_id']; ?>"
+                                                                        <?php echo !$article['published_end'] ? 'checked' : ''; ?>
+                                                                        onchange="toggleEndDate('edit', <?php echo $article['article_id']; ?>)">
+                                                                    <label class="form-check-label" for="no_expiry_edit_<?php echo $article['article_id']; ?>">
+                                                                        ไม่มีวันหมดอายุ
+                                                                    </label>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer">
@@ -242,10 +328,29 @@ if (!$result) {
                         </div>
                         <div class="mb-3">
                             <label class="form-label">สถานะ <span class="text-danger">*</span></label>
-                            <select name="status" class="form-select" required>
+                            <select name="status" class="form-select" id="status_add" required onchange="toggleScheduleFields('add', 0)">
                                 <option value="draft">แบบร่าง</option>
                                 <option value="published">เผยแพร่</option>
                             </select>
+                        </div>
+
+                        <div id="schedule_fields_add_0" style="display:none;">
+                            <div class="mb-3">
+                                <label class="form-label">วันเวลาเริ่มแสดง <span class="text-danger">*</span></label>
+                                <input type="datetime-local" name="published_start" class="form-control" value="<?php echo date('Y-m-d\TH:i'); ?>">
+                                <small class="text-muted">ถ้าไม่ระบุ จะใช้เวลาปัจจุบัน</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">วันเวลาสิ้นสุดการแสดง</label>
+                                <input type="datetime-local" name="published_end" class="form-control" id="published_end_add_0" disabled>
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" id="no_expiry_add_0" checked onchange="toggleEndDate('add', 0)">
+                                    <label class="form-check-label" for="no_expiry_add_0">
+                                        ไม่มีวันหมดอายุ
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -262,6 +367,31 @@ if (!$result) {
         function deleteArticle(id) {
             if(confirm('ต้องการลบบทความนี้หรือไม่?')) {
                 window.location.href = 'sql/article_delete.php?id=' + id;
+            }
+        }
+
+        // Toggle schedule fields based on status
+        function toggleScheduleFields(type, id) {
+            const statusSelect = document.getElementById('status_' + type + (type === 'add' ? '' : '_' + id));
+            const scheduleFields = document.getElementById('schedule_fields_' + type + '_' + id);
+
+            if (statusSelect.value === 'published') {
+                scheduleFields.style.display = 'block';
+            } else {
+                scheduleFields.style.display = 'none';
+            }
+        }
+
+        // Toggle end date field
+        function toggleEndDate(type, id) {
+            const checkbox = document.getElementById('no_expiry_' + type + '_' + id);
+            const endDateInput = document.getElementById('published_end_' + type + '_' + id);
+
+            if (checkbox.checked) {
+                endDateInput.disabled = true;
+                endDateInput.value = '';
+            } else {
+                endDateInput.disabled = false;
             }
         }
     </script>

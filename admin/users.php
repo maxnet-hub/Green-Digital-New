@@ -14,45 +14,38 @@ $status_filter = isset($_GET['status']) ? $_GET['status'] : '';
 
 // Query สมาชิก
 $sql = "SELECT * FROM users WHERE 1=1";
-$params = [];
-$types = '';
 
 if (!empty($search)) {
-    $sql .= " AND (first_name LIKE ? OR last_name LIKE ? OR email LIKE ? OR phone LIKE ?)";
-    $search_param = "%$search%";
-    $params[] = $search_param;
-    $params[] = $search_param;
-    $params[] = $search_param;
-    $params[] = $search_param;
-    $types .= 'ssss';
+    $search_escaped = mysqli_real_escape_string($conn, $search);
+    $sql .= " AND (first_name LIKE '%$search_escaped%' OR last_name LIKE '%$search_escaped%' OR email LIKE '%$search_escaped%' OR phone LIKE '%$search_escaped%')";
 }
 
 if (!empty($level)) {
-    $sql .= " AND user_level = ?";
-    $params[] = $level;
-    $types .= 's';
+    $level_escaped = mysqli_real_escape_string($conn, $level);
+    $sql .= " AND user_level = '$level_escaped'";
 }
 
 if (!empty($status_filter)) {
-    $sql .= " AND status = ?";
-    $params[] = $status_filter;
-    $types .= 's';
+    $status_escaped = mysqli_real_escape_string($conn, $status_filter);
+    $sql .= " AND status = '$status_escaped'";
 }
 
 $sql .= " ORDER BY created_at DESC";
 
-$stmt = $conn->prepare($sql);
-if (!empty($params)) {
-    $stmt->bind_param($types, ...$params);
-}
-$stmt->execute();
-$result = $stmt->get_result();
+$result = mysqli_query($conn, $sql);
 
 // Query สถิติ
-$total_users = $conn->query("SELECT COUNT(*) as c FROM users")->fetch_assoc()['c'];
-$bronze = $conn->query("SELECT COUNT(*) as c FROM users WHERE user_level='Bronze'")->fetch_assoc()['c'];
-$silver = $conn->query("SELECT COUNT(*) as c FROM users WHERE user_level='Silver'")->fetch_assoc()['c'];
-$gold = $conn->query("SELECT COUNT(*) as c FROM users WHERE user_level='Gold'")->fetch_assoc()['c'];
+$stats_result = mysqli_query($conn, "SELECT COUNT(*) as c FROM users");
+$total_users = mysqli_fetch_assoc($stats_result)['c'];
+
+$stats_result = mysqli_query($conn, "SELECT COUNT(*) as c FROM users WHERE user_level='Bronze'");
+$bronze = mysqli_fetch_assoc($stats_result)['c'];
+
+$stats_result = mysqli_query($conn, "SELECT COUNT(*) as c FROM users WHERE user_level='Silver'");
+$silver = mysqli_fetch_assoc($stats_result)['c'];
+
+$stats_result = mysqli_query($conn, "SELECT COUNT(*) as c FROM users WHERE user_level='Gold'");
+$gold = mysqli_fetch_assoc($stats_result)['c'];
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -147,8 +140,8 @@ $gold = $conn->query("SELECT COUNT(*) as c FROM users WHERE user_level='Gold'")-
                         <label class="form-label">สถานะ</label>
                         <select name="status" class="form-select">
                             <option value="">ทุกสถานะ</option>
-                            <option value="active" <?php echo $status_filter == 'active' ? 'selected' : ''; ?>>Active</option>
-                            <option value="suspended" <?php echo $status_filter == 'suspended' ? 'selected' : ''; ?>>Suspended</option>
+                            <option value="active" <?php echo $status_filter == 'active' ? 'selected' : ''; ?>>ใช้งานได้</option>
+                            <option value="suspended" <?php echo $status_filter == 'suspended' ? 'selected' : ''; ?>>ระงับการใช้งาน</option>
                         </select>
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
@@ -160,7 +153,7 @@ $gold = $conn->query("SELECT COUNT(*) as c FROM users WHERE user_level='Gold'")-
 
         <!-- ตารางสมาชิก -->
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="mb-0">👥 รายการสมาชิก (<?php echo $result->num_rows; ?> คน)</h4>
+            <h4 class="mb-0">👥 รายการสมาชิก (<?php echo mysqli_num_rows($result); ?> คน)</h4>
             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUserModal">
                 ➕ เพิ่มสมาชิก
             </button>
@@ -185,7 +178,7 @@ $gold = $conn->query("SELECT COUNT(*) as c FROM users WHERE user_level='Gold'")-
                     <tbody>
                         <?php
                         $no = 1;
-                        while($user = $result->fetch_assoc()):
+                        while($user = mysqli_fetch_assoc($result)):
                         ?>
                         <tr>
                             <td><?php echo $no++; ?></td>
@@ -201,12 +194,12 @@ $gold = $conn->query("SELECT COUNT(*) as c FROM users WHERE user_level='Gold'")-
                                 ?>
                                 <span class="badge <?php echo $badge_class; ?>"><?php echo $user['user_level']; ?></span>
                             </td>
-                            <td><?php echo number_format($user['total_points']); ?></td>
+                            <td><?php echo number_format($user['points']); ?></td>
                             <td>
                                 <?php if($user['status'] == 'active'): ?>
-                                    <span class="badge bg-success">Active</span>
+                                    <span class="badge bg-success">ใช้งานได้</span>
                                 <?php else: ?>
-                                    <span class="badge bg-danger">Suspended</span>
+                                    <span class="badge bg-danger">ระงับการใช้งาน</span>
                                 <?php endif; ?>
                             </td>
                             <td><?php echo date('d/m/Y', strtotime($user['created_at'])); ?></td>
@@ -303,8 +296,8 @@ $gold = $conn->query("SELECT COUNT(*) as c FROM users WHERE user_level='Gold'")-
                                 <div class="mb-3">
                                     <label class="form-label">สถานะ <span class="text-danger">*</span></label>
                                     <select name="status" class="form-select" required>
-                                        <option value="active" selected>Active</option>
-                                        <option value="suspended">Suspended</option>
+                                        <option value="active" selected>ใช้งานได้</option>
+                                        <option value="suspended">ระงับการใช้งาน</option>
                                     </select>
                                 </div>
                             </div>
@@ -321,12 +314,14 @@ $gold = $conn->query("SELECT COUNT(*) as c FROM users WHERE user_level='Gold'")-
 
     <!-- ========== Loop Modal ดูข้อมูล ========== -->
     <?php
-    $result->data_seek(0);
-    while($user = $result->fetch_assoc()):
+    mysqli_data_seek($result, 0);
+    while($user = mysqli_fetch_assoc($result)):
         // ดึงข้อมูลเพิ่มเติม
         $user_id = $user['user_id'];
-        $bookings = $conn->query("SELECT COUNT(*) as c FROM bookings WHERE user_id=$user_id")->fetch_assoc()['c'];
-        $co2 = $conn->query("SELECT COALESCE(SUM(co2_reduced), 0) as total FROM carbon_footprint WHERE user_id=$user_id")->fetch_assoc()['total'];
+        $bookings_result = mysqli_query($conn, "SELECT COUNT(*) as c FROM bookings WHERE user_id=$user_id");
+        $bookings = mysqli_fetch_assoc($bookings_result)['c'];
+        $co2_result = mysqli_query($conn, "SELECT COALESCE(SUM(co2_reduced), 0) as total FROM carbon_footprint WHERE user_id=$user_id");
+        $co2 = mysqli_fetch_assoc($co2_result)['total'];
     ?>
     <div class="modal fade" id="viewModal<?php echo $user['user_id']; ?>" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -378,7 +373,7 @@ $gold = $conn->query("SELECT COUNT(*) as c FROM users WHERE user_level='Gold'")-
                                 </tr>
                                 <tr>
                                     <th>แต้มสะสม:</th>
-                                    <td><strong><?php echo number_format($user['total_points']); ?></strong> แต้ม</td>
+                                    <td><strong><?php echo number_format($user['points']); ?></strong> แต้ม</td>
                                 </tr>
                                 <tr>
                                     <th>จำนวนการจอง:</th>
@@ -392,9 +387,9 @@ $gold = $conn->query("SELECT COUNT(*) as c FROM users WHERE user_level='Gold'")-
                                     <th>สถานะ:</th>
                                     <td>
                                         <?php if($user['status'] == 'active'): ?>
-                                            <span class="badge bg-success">Active</span>
+                                            <span class="badge bg-success">ใช้งานได้</span>
                                         <?php else: ?>
-                                            <span class="badge bg-danger">Suspended</span>
+                                            <span class="badge bg-danger">ระงับการใช้งาน</span>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -416,8 +411,8 @@ $gold = $conn->query("SELECT COUNT(*) as c FROM users WHERE user_level='Gold'")-
 
     <!-- ========== Loop Modal แก้ไข ========== -->
     <?php
-    $result->data_seek(0);
-    while($user = $result->fetch_assoc()):
+    mysqli_data_seek($result, 0);
+    while($user = mysqli_fetch_assoc($result)):
     ?>
     <div class="modal fade" id="editModal<?php echo $user['user_id']; ?>" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -495,7 +490,7 @@ $gold = $conn->query("SELECT COUNT(*) as c FROM users WHERE user_level='Gold'")-
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label class="form-label">แต้มสะสม</label>
-                                    <input type="number" name="total_points" class="form-control" value="<?php echo $user['total_points']; ?>" min="0">
+                                    <input type="number" name="points" class="form-control" value="<?php echo $user['points']; ?>" min="0">
                                 </div>
                             </div>
 
@@ -503,8 +498,8 @@ $gold = $conn->query("SELECT COUNT(*) as c FROM users WHERE user_level='Gold'")-
                                 <div class="mb-3">
                                     <label class="form-label">สถานะ <span class="text-danger">*</span></label>
                                     <select name="status" class="form-select" required>
-                                        <option value="active" <?php echo $user['status'] == 'active' ? 'selected' : ''; ?>>Active</option>
-                                        <option value="suspended" <?php echo $user['status'] == 'suspended' ? 'selected' : ''; ?>>Suspended</option>
+                                        <option value="active" <?php echo $user['status'] == 'active' ? 'selected' : ''; ?>>ใช้งานได้</option>
+                                        <option value="suspended" <?php echo $user['status'] == 'suspended' ? 'selected' : ''; ?>>ระงับการใช้งาน</option>
                                     </select>
                                 </div>
                             </div>

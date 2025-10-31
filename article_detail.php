@@ -18,20 +18,61 @@ if (empty($article_id) || !is_numeric($article_id)) {
 $update_views = "UPDATE articles SET views = views + 1 WHERE article_id = '$article_id'";
 mysqli_query($conn, $update_views);
 
-// ดึงข้อมูลบทความ
+// ดึงข้อมูลบทความ (ตรวจสอบว่าอยู่ในช่วงเวลาแสดงผล)
 $sql = "SELECT a.*, ad.full_name as author_name
         FROM articles a
         LEFT JOIN admins ad ON a.author_id = ad.admin_id
-        WHERE a.article_id = '$article_id' AND a.status = 'published'";
+        WHERE a.article_id = '$article_id'
+        AND a.status = 'published'
+        AND NOW() >= a.published_start
+        AND (a.published_end IS NULL OR NOW() <= a.published_end)";
 
 $result = mysqli_query($conn, $sql);
 
 if (!$result || mysqli_num_rows($result) == 0) {
+    // บทความไม่พบหรือหมดอายุ
     header("Location: articles.php");
     exit();
 }
 
 $article = mysqli_fetch_assoc($result);
+
+// ดึงคอมเมนต์ทั้งหมดของบทความนี้ (เฉพาะ active) - รวมทั้ง user และ admin
+$comments_sql = "SELECT c.*,
+                 u.first_name as user_first_name, u.last_name as user_last_name,
+                 a.full_name as admin_name,
+                 c.created_at, c.updated_at
+                 FROM article_comments c
+                 LEFT JOIN users u ON c.user_id = u.user_id
+                 LEFT JOIN admins a ON c.admin_id = a.admin_id
+                 WHERE c.article_id = '$article_id' AND c.status = 'active'
+                 ORDER BY c.created_at ASC";
+$comments_result = mysqli_query($conn, $comments_sql);
+
+// นับจำนวนคอมเมนต์
+$comment_count_sql = "SELECT COUNT(*) as total FROM article_comments WHERE article_id = '$article_id' AND status = 'active'";
+$comment_count_result = mysqli_query($conn, $comment_count_sql);
+$comment_count = mysqli_fetch_assoc($comment_count_result)['total'];
+
+// จัดเรียงคอมเมนต์เป็นโครงสร้าง parent-child
+$comments = [];
+$replies = [];
+if ($comments_result) {
+    while ($comment = mysqli_fetch_assoc($comments_result)) {
+        if ($comment['parent_comment_id'] === NULL) {
+            $comments[$comment['comment_id']] = $comment;
+            $comments[$comment['comment_id']]['replies'] = [];
+        } else {
+            $replies[$comment['parent_comment_id']][] = $comment;
+        }
+    }
+    // รวม replies เข้ากับ parent comments
+    foreach ($replies as $parent_id => $reply_list) {
+        if (isset($comments[$parent_id])) {
+            $comments[$parent_id]['replies'] = $reply_list;
+        }
+    }
+}
 
 // ดึงบทความที่เกี่ยวข้อง (category เดียวกัน)
 $related_sql = "SELECT * FROM articles
@@ -141,10 +182,100 @@ $related_articles = mysqli_query($conn, $related_sql);
         .back-button {
             margin-bottom: 20px;
         }
+
+        /* Comments Section */
+        .comments-section {
+            background: #f8f9fa;
+            padding: 40px 0;
+            margin-top: 40px;
+        }
+
+        .comments-header {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .comment-box {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .comment-author {
+            font-weight: bold;
+            color: #10b981;
+            font-size: 1.1em;
+        }
+
+        .comment-date {
+            color: #6b7280;
+            font-size: 0.9em;
+        }
+
+        .comment-text {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            word-wrap: break-word;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .comment-actions .btn {
+            font-size: 0.85em;
+            padding: 5px 15px;
+        }
+
+        .reply-box {
+            margin-left: 40px;
+            margin-top: 15px;
+            border-left: 3px solid #10b981;
+            padding-left: 15px;
+        }
+
+        .comment-form {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .comment-form textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .edit-indicator {
+            font-size: 0.85em;
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        .reply-form {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
-    <?php include 'includes/navbar.php'; ?>
+    <?php include 'navbar.php'; ?>
 
     <!-- Article Header -->
     <section class="article-header">
@@ -192,6 +323,230 @@ $related_articles = mysqli_query($conn, $related_sql);
         </div>
     </div>
 
+    <!-- Comments Section -->
+    <section class="comments-section" id="comments">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <h3 class="comments-header">💬 ความคิดเห็น (<?php echo $comment_count; ?>)</h3>
+
+                    <?php if(isset($_GET['comment_success'])): ?>
+                        <div class="alert alert-success alert-dismissible fade show">
+                            ✅ ส่งความคิดเห็นเรียบร้อยแล้ว!
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if(isset($_GET['edit_success'])): ?>
+                        <div class="alert alert-success alert-dismissible fade show">
+                            ✅ แก้ไขความคิดเห็นเรียบร้อยแล้ว!
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if(isset($_GET['delete_success'])): ?>
+                        <div class="alert alert-success alert-dismissible fade show">
+                            ✅ ลบความคิดเห็นเรียบร้อยแล้ว!
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if(isset($_GET['error'])): ?>
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            ❌
+                            <?php
+                            switch($_GET['error']) {
+                                case 'empty': echo 'กรุณากรอกความคิดเห็น'; break;
+                                case 'too_long': echo 'ความคิดเห็นยาวเกินไป (สูงสุด 2000 ตัวอักษร)'; break;
+                                case 'time_expired': echo 'หมดเวลาแก้ไข (สามารถแก้ไขได้ภายใน 15 นาที)'; break;
+                                default: echo 'เกิดข้อผิดพลาด';
+                            }
+                            ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- แสดงคอมเมนต์ทั้งหมด -->
+                    <?php if(count($comments) > 0): ?>
+                        <?php foreach($comments as $comment): ?>
+                            <div class="comment-box" id="comment-<?php echo $comment['comment_id']; ?>">
+                                <div class="comment-header">
+                                    <div>
+                                        <span class="comment-author">
+                                            <?php if($comment['admin_id']): ?>
+                                                👨‍💼 <?php echo htmlspecialchars($comment['admin_name']); ?> <span class="badge bg-primary">Admin</span>
+                                            <?php else: ?>
+                                                👤 <?php echo htmlspecialchars($comment['user_first_name'] . ' ' . $comment['user_last_name']); ?>
+                                            <?php endif; ?>
+                                        </span>
+                                        <span class="comment-date">
+                                            | <?php
+                                                $time_ago = time() - strtotime($comment['created_at']);
+                                                if ($time_ago < 60) echo 'เมื่อสักครู่';
+                                                elseif ($time_ago < 3600) echo floor($time_ago / 60) . ' นาทีที่แล้ว';
+                                                elseif ($time_ago < 86400) echo floor($time_ago / 3600) . ' ชั่วโมงที่แล้ว';
+                                                else echo floor($time_ago / 86400) . ' วันที่แล้ว';
+                                            ?>
+                                        </span>
+                                        <?php if($comment['updated_at']): ?>
+                                            <span class="edit-indicator">(แก้ไขแล้ว)</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+
+                                <div class="comment-text">
+                                    <?php echo nl2br(htmlspecialchars($comment['comment_text'])); ?>
+                                </div>
+
+                                <div class="comment-actions">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(<?php echo $comment['comment_id']; ?>)">
+                                        💬 ตอบกลับ
+                                    </button>
+
+                                    <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $comment['user_id']): ?>
+                                        <?php
+                                        $can_edit = (time() - strtotime($comment['created_at'])) <= (15 * 60);
+                                        if($can_edit):
+                                        ?>
+                                            <button class="btn btn-sm btn-outline-warning" onclick="toggleEditForm(<?php echo $comment['comment_id']; ?>)">
+                                                ✏️ แก้ไข
+                                            </button>
+                                        <?php endif; ?>
+
+                                        <form method="POST" action="sql/comment_delete.php" style="display: inline;" onsubmit="return confirm('ยืนยันการลบความคิดเห็น?')">
+                                            <input type="hidden" name="comment_id" value="<?php echo $comment['comment_id']; ?>">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">🗑️ ลบ</button>
+                                        </form>
+                                    <?php endif; ?>
+                                </div>
+
+                                <!-- ฟอร์มแก้ไข (ซ่อนไว้) -->
+                                <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $comment['user_id'] && $can_edit): ?>
+                                    <div class="reply-form" id="edit-form-<?php echo $comment['comment_id']; ?>">
+                                        <form method="POST" action="sql/comment_edit.php">
+                                            <input type="hidden" name="comment_id" value="<?php echo $comment['comment_id']; ?>">
+                                            <textarea name="comment_text" class="form-control mb-2" rows="3" required><?php echo htmlspecialchars($comment['comment_text']); ?></textarea>
+                                            <button type="submit" class="btn btn-sm btn-warning">💾 บันทึก</button>
+                                            <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEditForm(<?php echo $comment['comment_id']; ?>)">ยกเลิก</button>
+                                            <small class="text-muted d-block mt-1">แก้ไขได้ภายใน 15 นาทีหลังโพสต์</small>
+                                        </form>
+                                    </div>
+                                <?php endif; ?>
+
+                                <!-- ฟอร์มตอบกลับ (ซ่อนไว้) -->
+                                <div class="reply-form" id="reply-form-<?php echo $comment['comment_id']; ?>">
+                                    <?php if(isset($_SESSION['user_id']) || isset($_SESSION['admin_id'])): ?>
+                                        <form method="POST" action="sql/comment_add.php">
+                                            <input type="hidden" name="article_id" value="<?php echo $article_id; ?>">
+                                            <input type="hidden" name="parent_comment_id" value="<?php echo $comment['comment_id']; ?>">
+                                            <textarea name="comment_text" class="form-control mb-2" placeholder="เขียนตอบกลับ..." rows="3" required></textarea>
+                                            <button type="submit" class="btn btn-sm btn-primary">ส่งตอบกลับ</button>
+                                            <button type="button" class="btn btn-sm btn-secondary" onclick="toggleReplyForm(<?php echo $comment['comment_id']; ?>)">ยกเลิก</button>
+                                        </form>
+                                    <?php else: ?>
+                                        <div class="alert alert-info mb-0">
+                                            กรุณา <a href="user_login.php">เข้าสู่ระบบ</a> เพื่อตอบกลับความคิดเห็น
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+
+                                <!-- แสดงคำตอบกลับ (Replies) -->
+                                <?php if(count($comment['replies']) > 0): ?>
+                                    <?php foreach($comment['replies'] as $reply): ?>
+                                        <div class="reply-box" id="comment-<?php echo $reply['comment_id']; ?>">
+                                            <div class="comment-header">
+                                                <div>
+                                                    <span class="comment-author">
+                                                        <?php if($reply['admin_id']): ?>
+                                                            👨‍💼 <?php echo htmlspecialchars($reply['admin_name']); ?> <span class="badge bg-primary">Admin</span>
+                                                        <?php else: ?>
+                                                            👤 <?php echo htmlspecialchars($reply['user_first_name'] . ' ' . $reply['user_last_name']); ?>
+                                                        <?php endif; ?>
+                                                    </span>
+                                                    <span class="comment-date">
+                                                        | <?php
+                                                            $time_ago = time() - strtotime($reply['created_at']);
+                                                            if ($time_ago < 60) echo 'เมื่อสักครู่';
+                                                            elseif ($time_ago < 3600) echo floor($time_ago / 60) . ' นาทีที่แล้ว';
+                                                            elseif ($time_ago < 86400) echo floor($time_ago / 3600) . ' ชั่วโมงที่แล้ว';
+                                                            else echo floor($time_ago / 86400) . ' วันที่แล้ว';
+                                                        ?>
+                                                    </span>
+                                                    <?php if($reply['updated_at']): ?>
+                                                        <span class="edit-indicator">(แก้ไขแล้ว)</span>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+
+                                            <div class="comment-text">
+                                                <?php echo nl2br(htmlspecialchars($reply['comment_text'])); ?>
+                                            </div>
+
+                                            <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $reply['user_id']): ?>
+                                                <div class="comment-actions">
+                                                    <?php
+                                                    $can_edit_reply = (time() - strtotime($reply['created_at'])) <= (15 * 60);
+                                                    if($can_edit_reply):
+                                                    ?>
+                                                        <button class="btn btn-sm btn-outline-warning" onclick="toggleEditForm(<?php echo $reply['comment_id']; ?>)">
+                                                            ✏️ แก้ไข
+                                                        </button>
+                                                    <?php endif; ?>
+
+                                                    <form method="POST" action="sql/comment_delete.php" style="display: inline;" onsubmit="return confirm('ยืนยันการลบความคิดเห็น?')">
+                                                        <input type="hidden" name="comment_id" value="<?php echo $reply['comment_id']; ?>">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">🗑️ ลบ</button>
+                                                    </form>
+                                                </div>
+
+                                                <?php if($can_edit_reply): ?>
+                                                    <div class="reply-form" id="edit-form-<?php echo $reply['comment_id']; ?>" style="margin-top: 10px;">
+                                                        <form method="POST" action="sql/comment_edit.php">
+                                                            <input type="hidden" name="comment_id" value="<?php echo $reply['comment_id']; ?>">
+                                                            <textarea name="comment_text" class="form-control mb-2" rows="2" required><?php echo htmlspecialchars($reply['comment_text']); ?></textarea>
+                                                            <button type="submit" class="btn btn-sm btn-warning">💾 บันทึก</button>
+                                                            <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEditForm(<?php echo $reply['comment_id']; ?>)">ยกเลิก</button>
+                                                        </form>
+                                                    </div>
+                                                <?php endif; ?>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="alert alert-info">
+                            💭 ยังไม่มีความคิดเห็น เป็นคนแรกที่แสดงความคิดเห็นสิ!
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- ฟอร์มเขียนความคิดเห็นใหม่ -->
+                    <div class="comment-form">
+                        <h5 class="mb-3">✍️ แสดงความคิดเห็น</h5>
+                        <?php if(isset($_SESSION['user_id']) || isset($_SESSION['admin_id'])): ?>
+                            <?php if(isset($_SESSION['admin_id'])): ?>
+                                <div class="alert alert-info mb-3">
+                                    <strong>👨‍💼 คุณกำลังคอมเมนต์ในฐานะ Admin:</strong> <?php echo $_SESSION['full_name']; ?>
+                                </div>
+                            <?php endif; ?>
+                            <form method="POST" action="sql/comment_add.php">
+                                <input type="hidden" name="article_id" value="<?php echo $article_id; ?>">
+                                <textarea name="comment_text" class="form-control mb-3" placeholder="แชร์ความคิดเห็นของคุณ..." rows="4" maxlength="2000" required></textarea>
+                                <small class="text-muted d-block mb-2">สูงสุด 2000 ตัวอักษร</small>
+                                <button type="submit" class="btn btn-success">📨 ส่งความคิดเห็น</button>
+                            </form>
+                        <?php else: ?>
+                            <div class="alert alert-warning">
+                                กรุณา <a href="user_login.php" class="alert-link">เข้าสู่ระบบ</a> หรือ <a href="user_register.php" class="alert-link">สมัครสมาชิก</a> เพื่อแสดงความคิดเห็น
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Related Articles -->
     <?php if($related_articles && mysqli_num_rows($related_articles) > 0): ?>
     <section class="related-articles">
@@ -228,8 +583,29 @@ $related_articles = mysqli_query($conn, $related_sql);
     </section>
     <?php endif; ?>
 
-    <?php include 'includes/footer.php'; ?>
+    <?php include 'footer.php'; ?>
 
     <script src="js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle Reply Form
+        function toggleReplyForm(commentId) {
+            const form = document.getElementById('reply-form-' + commentId);
+            if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'block';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+
+        // Toggle Edit Form
+        function toggleEditForm(commentId) {
+            const form = document.getElementById('edit-form-' + commentId);
+            if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'block';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>

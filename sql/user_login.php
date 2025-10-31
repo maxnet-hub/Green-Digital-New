@@ -12,6 +12,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result && mysqli_num_rows($result) == 1) {
         $user = mysqli_fetch_assoc($result);
 
+        // ตรวจสอบสถานะบัญชี
+        if (isset($user['status']) && $user['status'] == 'suspended') {
+            header('Location: ../user_login.php?error=suspended');
+            exit();
+        }
+
         // ตรวจสอบรหัสผ่าน
         if (password_verify($password, $user['password'])) {
             // เข้าสู่ระบบสำเร็จ
@@ -19,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['username'] = $user['email'];
             $_SESSION['full_name'] = $user['first_name'] . ' ' . $user['last_name'];
 
-            header("Location: ../user/dashboard.php");
+            header("Location: ../dashboard.php");
             exit();
         }
     }

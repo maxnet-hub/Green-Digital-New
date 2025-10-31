@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $province = $_POST['province'];
     $district = $_POST['district'];
     $user_level = $_POST['user_level'];
-    $total_points = $_POST['total_points'];
+    $points = $_POST['points'];
     $status = $_POST['status'];
     $password = $_POST['password'];
 
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 province = '$province',
                 district = '$district',
                 user_level = '$user_level',
-                total_points = '$total_points',
+                points = '$points',
                 status = '$status',
                 updated_at = NOW()";
 

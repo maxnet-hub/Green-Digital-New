@@ -79,9 +79,9 @@ if ($_SESSION['role'] == 'staff') {
 } else {
     // แอดมินและเจ้าของร้านนับทั้งหมด
     $status_sql = "SELECT status, COUNT(*) as count FROM bookings GROUP BY status";
-    $status_result = $conn->query($status_sql);
+    $status_result = mysqli_query($conn, $status_sql);
 }
-while ($row = $status_result->fetch_assoc()) {
+while ($row = mysqli_fetch_assoc($status_result)) {
     $status_counts[$row['status']] = $row['count'];
 }
 ?>
@@ -231,8 +231,8 @@ while ($row = $status_result->fetch_assoc()) {
 
         <!-- Bookings List -->
         <div class="row">
-            <?php if ($bookings && $bookings->num_rows > 0): ?>
-                <?php while ($booking = $bookings->fetch_assoc()): ?>
+            <?php if ($bookings && mysqli_num_rows($bookings) > 0): ?>
+                <?php while ($booking = mysqli_fetch_assoc($bookings)): ?>
                 <div class="col-lg-6 col-xl-4">
                     <div class="booking-card">
                         <div class="d-flex justify-content-between align-items-start mb-3">

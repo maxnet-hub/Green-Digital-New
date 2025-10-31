@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once '../../config.php';
 
 // ตรวจสอบว่า login แล้วหรือยัง
@@ -43,19 +42,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // ดึงข้อมูล booking
-    $booking_sql = "SELECT * FROM bookings WHERE booking_id = ?";
-    $stmt = $conn->prepare($booking_sql);
-    $stmt->bind_param('i', $booking_id);
-    $stmt->execute();
-    $booking_result = $stmt->get_result();
+    $booking_sql = "SELECT * FROM bookings WHERE booking_id = $booking_id";
+    $booking_result = mysqli_query($conn, $booking_sql);
 
-    if ($booking_result->num_rows == 0) {
+    if (mysqli_num_rows($booking_result) == 0) {
         $_SESSION['error'] = 'ไม่พบการจองนี้';
         header("Location: ../bookings.php");
         exit();
     }
 
-    $booking = $booking_result->fetch_assoc();
+    $booking = mysqli_fetch_assoc($booking_result);
 
     // เช็คว่าสถานะเป็น confirmed หรือไม่
     if ($booking['status'] != 'confirmed') {
@@ -65,34 +61,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // เช็คว่ามี transaction อยู่แล้วหรือไม่
-    $check_trans = "SELECT transaction_id FROM transactions WHERE booking_id = ? LIMIT 1";
-    $stmt_check = $conn->prepare($check_trans);
-    $stmt_check->bind_param('i', $booking_id);
-    $stmt_check->execute();
-    $trans_result = $stmt_check->get_result();
+    $check_trans = "SELECT transaction_id FROM transactions WHERE booking_id = $booking_id LIMIT 1";
+    $trans_result = mysqli_query($conn, $check_trans);
 
-    if ($trans_result->num_rows > 0) {
+    if (mysqli_num_rows($trans_result) > 0) {
         $_SESSION['error'] = 'มี transaction สำหรับการจองนี้อยู่แล้ว';
         header("Location: ../booking_detail.php?id=$booking_id");
         exit();
     }
 
     // เริ่ม Transaction
-    $conn->begin_transaction();
+    mysqli_begin_transaction($conn);
 
     try {
         // 1. อัพเดทสถานะเป็น completed
-        $update_booking = "UPDATE bookings SET status = 'completed', updated_at = NOW() WHERE booking_id = ?";
-        $stmt_update = $conn->prepare($update_booking);
-        $stmt_update->bind_param('i', $booking_id);
-        $stmt_update->execute();
+        $update_booking = "UPDATE bookings SET status = 'completed', updated_at = NOW() WHERE booking_id = $booking_id";
+        mysqli_query($conn, $update_booking);
 
         // 2. สร้าง transaction
+        $user_id = $booking['user_id'];
         $insert_trans = "INSERT INTO transactions (booking_id, user_id, total_weight, total_amount, payment_method, payment_status, payment_date, created_at)
-                         VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())";
-        $stmt_insert = $conn->prepare($insert_trans);
-        $stmt_insert->bind_param('iiddss', $booking_id, $booking['user_id'], $total_weight, $total_amount, $payment_method, $payment_status);
-        $stmt_insert->execute();
+                         VALUES ($booking_id, $user_id, $total_weight, $total_amount, '$payment_method', '$payment_status', NOW(), NOW())";
+        mysqli_query($conn, $insert_trans);
 
         // 3. ระบบแต้มสะสม (Points System)
         // คำนวณแต้ม: 100 บาท = 1 แต้ม
@@ -101,26 +91,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             if ($points_earned > 0) {
                 // เช็คว่าเคยให้แต้มสำหรับ booking_id นี้แล้วหรือยัง (ป้องกันการให้ซ้ำ)
-                $check_points = "SELECT transaction_id FROM point_transactions WHERE booking_id = ? LIMIT 1";
-                $stmt_check_points = $conn->prepare($check_points);
-                $stmt_check_points->bind_param('i', $booking_id);
-                $stmt_check_points->execute();
-                $points_result = $stmt_check_points->get_result();
+                $check_points = "SELECT transaction_id FROM point_transactions WHERE booking_id = $booking_id LIMIT 1";
+                $points_result = mysqli_query($conn, $check_points);
 
-                if ($points_result->num_rows == 0) {
+                if (mysqli_num_rows($points_result) == 0) {
                     // อัพเดทแต้มในตาราง users
-                    $update_points = "UPDATE users SET points = points + ? WHERE user_id = ?";
-                    $stmt_update_points = $conn->prepare($update_points);
-                    $stmt_update_points->bind_param('ii', $points_earned, $booking['user_id']);
-                    $stmt_update_points->execute();
+                    $update_points = "UPDATE users SET points = points + $points_earned WHERE user_id = $user_id";
+                    mysqli_query($conn, $update_points);
 
                     // บันทึกประวัติการได้แต้มในตาราง point_transactions
                     $points_description = "ได้รับแต้มจากการจองหมายเลข #" . str_pad($booking_id, 6, '0', STR_PAD_LEFT);
                     $insert_points = "INSERT INTO point_transactions (user_id, booking_id, points, amount, transaction_type, description, created_at)
-                                     VALUES (?, ?, ?, ?, 'earn', ?, NOW())";
-                    $stmt_insert_points = $conn->prepare($insert_points);
-                    $stmt_insert_points->bind_param('iiids', $booking['user_id'], $booking_id, $points_earned, $total_amount, $points_description);
-                    $stmt_insert_points->execute();
+                                     VALUES ($user_id, $booking_id, $points_earned, $total_amount, 'earn', '$points_description', NOW())";
+                    mysqli_query($conn, $insert_points);
+                }
+            }
+        }
+
+        // 3.5 บันทึก Carbon Footprint
+        if ($payment_status == 'paid') {
+            // คำนวณ CO2 ที่ลดได้จาก booking_items
+            $co2_sql = "SELECT SUM(bi.quantity * rt.co2_reduction) as total_co2
+                        FROM booking_items bi
+                        JOIN recycle_types rt ON bi.type_id = rt.type_id
+                        WHERE bi.booking_id = $booking_id";
+            $co2_result = mysqli_query($conn, $co2_sql);
+            $co2_data = mysqli_fetch_assoc($co2_result);
+            $co2_reduced = $co2_data['total_co2'] ?? 0;
+
+            if ($co2_reduced > 0) {
+                // เช็คว่าเคยบันทึก CO2 สำหรับ booking_id นี้แล้วหรือยัง (ป้องกันการบันทึกซ้ำ)
+                $check_carbon = "SELECT footprint_id FROM carbon_footprint WHERE booking_id = $booking_id LIMIT 1";
+                $carbon_result = mysqli_query($conn, $check_carbon);
+
+                if (mysqli_num_rows($carbon_result) == 0) {
+                    // คำนวณค่าอื่นๆ จาก CO2
+                    // 1 ต้นไม้ดูดซับ CO2 ได้ประมาณ 21 kg/ปี
+                    $trees_equivalent = $co2_reduced / 21;
+                    // ประมาณการพลังงานที่ประหยัดได้ (1 kg CO2 ~ 0.5 kWh)
+                    $energy_saved = $co2_reduced * 0.5;
+
+                    // บันทึกลงตาราง carbon_footprint
+                    $insert_carbon = "INSERT INTO carbon_footprint (user_id, booking_id, co2_reduced, trees_equivalent, energy_saved, created_at)
+                                     VALUES ($user_id, $booking_id, $co2_reduced, $trees_equivalent, $energy_saved, NOW())";
+                    mysqli_query($conn, $insert_carbon);
                 }
             }
         }
@@ -135,26 +149,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $notification_message .= " | คุณได้รับ " . $points_earned . " แต้ม";
         }
 
+        // เพิ่มข้อความ CO2 ที่ลดได้ในการแจ้งเตือน (ถ้ามี)
+        if ($payment_status == 'paid' && isset($co2_reduced) && $co2_reduced > 0) {
+            $notification_message .= " | ช่วยลด CO2 ได้ " . number_format($co2_reduced, 2) . " kg";
+        }
+
         $notification_sql = "INSERT INTO notifications (user_id, title, message, type, is_read, created_at)
-                            VALUES (?, ?, ?, 'booking', FALSE, NOW())";
-        $stmt_noti = $conn->prepare($notification_sql);
-        $stmt_noti->bind_param('iss', $booking['user_id'], $notification_title, $notification_message);
-        $stmt_noti->execute();
+                            VALUES ($user_id, '$notification_title', '$notification_message', 'booking', 0, NOW())";
+        mysqli_query($conn, $notification_sql);
 
         // Commit Transaction
-        $conn->commit();
+        mysqli_commit($conn);
 
         $_SESSION['success'] = 'ชำระเงินสำเร็จ! การจองเสร็จสิ้นแล้ว';
 
     } catch (Exception $e) {
         // Rollback ถ้ามีข้อผิดพลาด
-        $conn->rollback();
+        mysqli_rollback($conn);
         $_SESSION['error'] = 'เกิดข้อผิดพลาด: ' . $e->getMessage();
     }
-
-    // ปิดการเชื่อมต่อ
-    $stmt->close();
-    $conn->close();
 
     // Redirect กลับหน้า booking_detail
     header("Location: ../booking_detail.php?id=$booking_id");

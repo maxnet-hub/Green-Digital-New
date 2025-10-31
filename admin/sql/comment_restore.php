@@ -1,0 +1,27 @@
+<?php
+require_once '../../config.php';
+
+// ตรวจสอบว่าเป็น Admin
+if (!isset($_SESSION['admin_id'])) {
+    header("Location: ../../login.php");
+    exit();
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $comment_id = intval($_POST['comment_id']);
+
+    // แสดงคอมเมนต์อีกครั้ง
+    $sql = "UPDATE article_comments SET status = 'active' WHERE comment_id = $comment_id";
+
+    if (mysqli_query($conn, $sql)) {
+        header("Location: ../article_comments.php?success=1");
+        exit();
+    } else {
+        header("Location: ../article_comments.php?error=1");
+        exit();
+    }
+} else {
+    header("Location: ../article_comments.php");
+    exit();
+}
+?>

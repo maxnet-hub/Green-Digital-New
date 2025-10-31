@@ -18,13 +18,26 @@
             <div class="login-body">
                 <?php if (isset($_GET['error'])): ?>
                     <div class="alert alert-danger" role="alert">
-                        <strong>ผิดพลาด!</strong> อีเมล/เบอร์โทร หรือรหัสผ่านไม่ถูกต้อง
+                        <strong>ผิดพลาด!</strong>
+                        <?php
+                        if ($_GET['error'] == 'suspended') {
+                            echo 'บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ';
+                        } else {
+                            echo 'อีเมล/เบอร์โทร หรือรหัสผ่านไม่ถูกต้อง';
+                        }
+                        ?>
                     </div>
                 <?php endif; ?>
 
                 <?php if (isset($_GET['success']) && $_GET['success'] == 'registered'): ?>
                     <div class="alert alert-success" role="alert">
                         <strong>สำเร็จ!</strong> สมัครสมาชิกเรียบร้อย กรุณาเข้าสู่ระบบ
+                    </div>
+                <?php endif; ?>
+
+                <?php if (isset($_GET['success']) && $_GET['success'] == 'password_reset'): ?>
+                    <div class="alert alert-success" role="alert">
+                        <strong>สำเร็จ!</strong> เปลี่ยนรหัสผ่านเรียบร้อย กรุณาเข้าสู่ระบบด้วยรหัสผ่านใหม่
                     </div>
                 <?php endif; ?>
 
@@ -43,6 +56,9 @@
                 </form>
 
                 <div class="text-center mt-3">
+                    <p class="mb-2">
+                        <a href="forgot_password.php" class="text-decoration-none text-warning">🔐 ลืมรหัสผ่าน?</a>
+                    </p>
                     <p class="mb-2">ยังไม่มีบัญชี? <a href="user_register.php" class="text-decoration-none">สมัครสมาชิก</a></p>
                     <a href="index.php" class="text-decoration-none">← กลับหน้าหลัก</a>
                 </div>

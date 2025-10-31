@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once '../../config.php';
 
 // ตรวจสอบว่า login แล้วหรือยัง
@@ -31,62 +30,46 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // ดึง price_per_kg จาก booking_items
-    $check_sql = "SELECT price_per_kg FROM booking_items WHERE item_id = ? AND booking_id = ?";
-    $stmt = $conn->prepare($check_sql);
-    $stmt->bind_param('ii', $item_id, $booking_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $check_sql = "SELECT price_per_kg FROM booking_items WHERE item_id = $item_id AND booking_id = $booking_id";
+    $result = mysqli_query($conn, $check_sql);
 
-    if ($result->num_rows == 0) {
+    if (mysqli_num_rows($result) == 0) {
         $_SESSION['error'] = 'ไม่พบรายการนี้';
         header("Location: ../booking_detail.php?id=$booking_id");
         exit();
     }
 
-    $item_data = $result->fetch_assoc();
+    $item_data = mysqli_fetch_assoc($result);
     $price_per_kg = $item_data['price_per_kg'];
 
     // คำนวณ subtotal
     $subtotal = $quantity * $price_per_kg;
 
     // อัพเดทข้อมูลในตาราง booking_items
-    $update_sql = "UPDATE booking_items SET quantity = ?, subtotal = ? WHERE item_id = ?";
-    $stmt = $conn->prepare($update_sql);
-    $stmt->bind_param('ddi', $quantity, $subtotal, $item_id);
+    $update_sql = "UPDATE booking_items SET quantity = $quantity, subtotal = $subtotal WHERE item_id = $item_id";
+    $result = mysqli_query($conn, $update_sql);
 
-    if ($stmt->execute()) {
+    if ($result) {
         // อัพเดท transactions ถ้ามี
-        $trans_check = "SELECT transaction_id FROM transactions WHERE booking_id = ? LIMIT 1";
-        $stmt_trans = $conn->prepare($trans_check);
-        $stmt_trans->bind_param('i', $booking_id);
-        $stmt_trans->execute();
-        $trans_result = $stmt_trans->get_result();
+        $trans_check = "SELECT transaction_id FROM transactions WHERE booking_id = $booking_id LIMIT 1";
+        $trans_result = mysqli_query($conn, $trans_check);
 
-        if ($trans_result->num_rows > 0) {
+        if (mysqli_num_rows($trans_result) > 0) {
             // คำนวณยอดรวมใหม่
-            $total_sql = "SELECT SUM(subtotal) as total_amount FROM booking_items WHERE booking_id = ?";
-            $stmt_total = $conn->prepare($total_sql);
-            $stmt_total->bind_param('i', $booking_id);
-            $stmt_total->execute();
-            $total_result = $stmt_total->get_result();
-            $total_data = $total_result->fetch_assoc();
+            $total_sql = "SELECT SUM(subtotal) as total_amount FROM booking_items WHERE booking_id = $booking_id";
+            $total_result = mysqli_query($conn, $total_sql);
+            $total_data = mysqli_fetch_assoc($total_result);
             $new_total = $total_data['total_amount'];
 
             // อัพเดท transaction
-            $update_trans = "UPDATE transactions SET total_amount = ? WHERE booking_id = ?";
-            $stmt_update_trans = $conn->prepare($update_trans);
-            $stmt_update_trans->bind_param('di', $new_total, $booking_id);
-            $stmt_update_trans->execute();
+            $update_trans = "UPDATE transactions SET total_amount = $new_total WHERE booking_id = $booking_id";
+            mysqli_query($conn, $update_trans);
         }
 
         $_SESSION['success'] = 'แก้ไขรายการสำเร็จ';
     } else {
-        $_SESSION['error'] = 'เกิดข้อผิดพลาด: ' . $conn->error;
+        $_SESSION['error'] = 'เกิดข้อผิดพลาด: ' . mysqli_error($conn);
     }
-
-    // ปิดการเชื่อมต่อ
-    $stmt->close();
-    $conn->close();
 
     // Redirect กลับหน้าเดิม
     header("Location: ../booking_detail.php?id=$booking_id");

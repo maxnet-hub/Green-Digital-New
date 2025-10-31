@@ -286,15 +286,15 @@
             <h2>📊 สรุปโครงสร้างฐานข้อมูล</h2>
             <div class="stats">
                 <div class="stat-box">
-                    <div class="stat-number">15</div>
+                    <div class="stat-number">18</div>
                     <div>ตาราง (Tables)</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-number">160+</div>
+                    <div class="stat-number">190+</div>
                     <div>ฟิลด์ (Fields)</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-number">12+</div>
+                    <div class="stat-number">16+</div>
                     <div>ความสัมพันธ์ (Relations)</div>
                 </div>
             </div>
@@ -372,6 +372,12 @@
                         <td class="data-type">VARCHAR(50)</td>
                         <td></td>
                         <td>เขต/อำเภอ</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">security_answer</td>
+                        <td class="data-type">VARCHAR(255)</td>
+                        <td></td>
+                        <td>คำตอบคำถามความปลอดภัย: "เพื่อนสนิทของคุณคือใคร" (สำหรับกู้คืนรหัสผ่าน)</td>
                     </tr>
                     <tr>
                         <td class="field-name">user_level</td>
@@ -461,6 +467,12 @@
                         <td class="data-type">ENUM</td>
                         <td></td>
                         <td>บทบาท: super_admin, admin</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">status</td>
+                        <td class="data-type">ENUM</td>
+                        <td></td>
+                        <td>สถานะ: active (ใช้งานได้), suspended (ระงับการใช้งาน)</td>
                     </tr>
                     <tr>
                         <td class="field-name">created_at</td>
@@ -987,7 +999,274 @@
             </table>
         </div>
 
-        <!-- 9. Carbon Footprint Table -->
+        <!-- 9. Rewards Table (ของรางวัลที่แลกได้) -->
+        <div class="table-card">
+            <div class="table-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <span>🎁</span>
+                <div>
+                    <h3>rewards</h3>
+                    <p class="table-desc">ของรางวัลที่แลกได้ด้วยแต้มสะสม</p>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ฟิลด์</th>
+                        <th>ชนิดข้อมูล</th>
+                        <th>คีย์</th>
+                        <th>คำอธิบาย</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="field-name">reward_id</td>
+                        <td class="data-type">INT</td>
+                        <td><span class="key-badge pk">PK</span></td>
+                        <td>รหัสของรางวัล</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">reward_name</td>
+                        <td class="data-type">VARCHAR(200)</td>
+                        <td></td>
+                        <td>ชื่อของรางวัล (เช่น ไข่ไก่ 10 ฟอง)</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">description</td>
+                        <td class="data-type">TEXT</td>
+                        <td></td>
+                        <td>รายละเอียดของรางวัล</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">points_required</td>
+                        <td class="data-type">INT</td>
+                        <td></td>
+                        <td>แต้มที่ต้องใช้แลก</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">stock_quantity</td>
+                        <td class="data-type">INT</td>
+                        <td></td>
+                        <td>จำนวนคงเหลือ (0 = ไม่จำกัด)</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">image_url</td>
+                        <td class="data-type">VARCHAR(255)</td>
+                        <td></td>
+                        <td>รูปภาพของรางวัล</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">category</td>
+                        <td class="data-type">ENUM</td>
+                        <td></td>
+                        <td>หมวดหมู่: food, product, voucher, discount</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">status</td>
+                        <td class="data-type">ENUM</td>
+                        <td></td>
+                        <td>สถานะ: active, inactive, out_of_stock</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">created_at</td>
+                        <td class="data-type">DATETIME</td>
+                        <td></td>
+                        <td>วันที่สร้าง</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">updated_at</td>
+                        <td class="data-type">DATETIME</td>
+                        <td></td>
+                        <td>วันที่แก้ไขล่าสุด</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 10. Reward Redemptions Table (ประวัติการแลกของรางวัล) -->
+        <div class="table-card">
+            <div class="table-header" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <span>📋</span>
+                <div>
+                    <h3>reward_redemptions</h3>
+                    <p class="table-desc">ประวัติการแลกของรางวัลด้วยแต้ม</p>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ฟิลด์</th>
+                        <th>ชนิดข้อมูล</th>
+                        <th>คีย์</th>
+                        <th>คำอธิบาย</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="field-name">redemption_id</td>
+                        <td class="data-type">INT</td>
+                        <td><span class="key-badge pk">PK</span></td>
+                        <td>รหัสการแลก</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">user_id</td>
+                        <td class="data-type">INT</td>
+                        <td><span class="key-badge fk">FK</span></td>
+                        <td>ผู้ใช้ → users</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">reward_id</td>
+                        <td class="data-type">INT</td>
+                        <td><span class="key-badge fk">FK</span></td>
+                        <td>ของรางวัล → rewards</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">points_used</td>
+                        <td class="data-type">INT</td>
+                        <td></td>
+                        <td>แต้มที่ใช้แลกต่อชิ้น</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">quantity</td>
+                        <td class="data-type">INT</td>
+                        <td></td>
+                        <td>จำนวนที่แลก</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">total_points</td>
+                        <td class="data-type">INT</td>
+                        <td></td>
+                        <td>แต้มรวมทั้งหมด (points_used × quantity)</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">status</td>
+                        <td class="data-type">ENUM</td>
+                        <td></td>
+                        <td>สถานะ: completed (เสร็จสิ้น), cancelled (ยกเลิก) - พนักงานแลกให้โดยตรง</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">redemption_date</td>
+                        <td class="data-type">DATETIME</td>
+                        <td></td>
+                        <td>วันที่แลก</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">delivery_method</td>
+                        <td class="data-type">ENUM</td>
+                        <td></td>
+                        <td>วิธีรับ: pickup (รับเอง), delivery (จัดส่ง)</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">delivery_address</td>
+                        <td class="data-type">TEXT</td>
+                        <td></td>
+                        <td>ที่อยู่จัดส่ง (ถ้าเลือก delivery)</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">notes</td>
+                        <td class="data-type">TEXT</td>
+                        <td></td>
+                        <td>หมายเหตุจากลูกค้า</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">admin_note</td>
+                        <td class="data-type">TEXT</td>
+                        <td></td>
+                        <td>หมายเหตุจาก Admin</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">redeemed_by</td>
+                        <td class="data-type">INT</td>
+                        <td><span class="key-badge fk">FK</span></td>
+                        <td>พนักงานที่แลกให้ลูกค้า → admins (เปลี่ยนจากระบบอนุมัติเป็นพนักงานแลกให้โดยตรง)</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">created_at</td>
+                        <td class="data-type">DATETIME</td>
+                        <td></td>
+                        <td>วันที่สร้าง</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 11. Article Comments Table -->
+        <div class="table-card">
+            <div class="table-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <span>💬</span>
+                <div>
+                    <h3>article_comments</h3>
+                    <p class="table-desc">ความคิดเห็นบทความ (รองรับการตอบกลับ)</p>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ฟิลด์</th>
+                        <th>ชนิดข้อมูล</th>
+                        <th>คีย์</th>
+                        <th>คำอธิบาย</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="field-name">comment_id</td>
+                        <td class="data-type">INT</td>
+                        <td><span class="key-badge pk">PK</span></td>
+                        <td>รหัสความคิดเห็น</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">article_id</td>
+                        <td class="data-type">INT</td>
+                        <td><span class="key-badge fk">FK</span></td>
+                        <td>บทความ → articles</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">user_id</td>
+                        <td class="data-type">INT</td>
+                        <td><span class="key-badge fk">FK</span></td>
+                        <td>ผู้ใช้ที่แสดงความคิดเห็น → users (NULL = คอมเมนต์จาก Admin)</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">admin_id</td>
+                        <td class="data-type">INT</td>
+                        <td><span class="key-badge fk">FK</span></td>
+                        <td>Admin ที่แสดงความคิดเห็น → admins (NULL = คอมเมนต์จาก User)</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">comment_text</td>
+                        <td class="data-type">TEXT</td>
+                        <td></td>
+                        <td>เนื้อหาความคิดเห็น (สูงสุด 2000 ตัวอักษร)</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">parent_comment_id</td>
+                        <td class="data-type">INT</td>
+                        <td><span class="key-badge fk">FK</span></td>
+                        <td>คอมเมนต์หลัก (สำหรับการตอบกลับ) → article_comments, NULL = คอมเมนต์หลัก</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">status</td>
+                        <td class="data-type">ENUM</td>
+                        <td></td>
+                        <td>สถานะ: active (แสดง), deleted (ลบโดยเจ้าของ), hidden (ซ่อนโดย Admin)</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">created_at</td>
+                        <td class="data-type">DATETIME</td>
+                        <td></td>
+                        <td>วันที่สร้าง</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">updated_at</td>
+                        <td class="data-type">DATETIME</td>
+                        <td></td>
+                        <td>วันที่แก้ไขล่าสุด (แก้ไขได้ภายใน 15 นาที)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 12. Carbon Footprint Table -->
         <div class="table-card">
             <div class="table-header color-emerald">
                 <span>🌱</span>
@@ -1124,6 +1403,18 @@
                         <td class="data-type">DATETIME</td>
                         <td></td>
                         <td>วันที่เผยแพร่</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">published_start</td>
+                        <td class="data-type">DATETIME</td>
+                        <td>DEFAULT CURRENT_TIMESTAMP</td>
+                        <td>วันเวลาเริ่มแสดงบทความ</td>
+                    </tr>
+                    <tr>
+                        <td class="field-name">published_end</td>
+                        <td class="data-type">DATETIME</td>
+                        <td>NULL</td>
+                        <td>วันเวลาสิ้นสุดการแสดง (NULL = ไม่มีวันหมดอายุ)</td>
                     </tr>
                     <tr>
                         <td class="field-name">created_at</td>

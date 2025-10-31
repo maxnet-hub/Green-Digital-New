@@ -6,8 +6,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // ดึงข้อมูล admin จากฐานข้อมูล
-    $sql = "SELECT admin_id, username, password, full_name, role FROM admins WHERE username = ?";
+    // ดึงข้อมูล admin จากฐานข้อมูล (รวมสถานะ)
+    $sql = "SELECT admin_id, username, password, full_name, role, status FROM admins WHERE username = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $username);
     $stmt->execute();
@@ -15,6 +15,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($result->num_rows > 0) {
         $admin = $result->fetch_assoc();
+
+        // ตรวจสอบสถานะบัญชี
+        if (isset($admin['status']) && $admin['status'] == 'suspended') {
+            // บัญชีถูกระงับ
+            header('Location: ../login.php?error=suspended');
+            exit();
+        }
 
         // ตรวจสอบรหัสผ่าน
         if (password_verify($password, $admin['password'])) {

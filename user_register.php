@@ -156,6 +156,13 @@ $current_page = 'register';
                             <input type="text" name="district" class="form-control" placeholder="เช่น บางกะปิ" required>
                         </div>
 
+                        <!-- Security Answer -->
+                        <div class="col-12 mb-3">
+                            <label class="form-label">เพื่อนสนิทของคุณคือใคร? <span class="required">*</span></label>
+                            <input type="text" name="security_answer" class="form-control" placeholder="ใช้สำหรับกู้คืนรหัสผ่าน" required>
+                            <small class="text-muted">⚠️ จำคำตอบให้ดี เพราะจะใช้ในการกู้คืนรหัสผ่าน (ตรงตัวพิมพ์เล็ก-ใหญ่)</small>
+                        </div>
+
                         <!-- Submit Button -->
                         <div class="col-12 mt-3">
                             <button type="submit" class="btn btn-success btn-register w-100">

@@ -8,10 +8,17 @@ if (!isset($_SESSION['admin_id'])) {
 }
 
 // ดึงข้อมูลสถิติ
-$total_users = $conn->query("SELECT COUNT(*) as count FROM users")->fetch_assoc()['count'];
-$total_bookings = $conn->query("SELECT COUNT(*) as count FROM bookings")->fetch_assoc()['count'];
-$pending_bookings = $conn->query("SELECT COUNT(*) as count FROM bookings WHERE status='pending'")->fetch_assoc()['count'];
-$total_revenue = $conn->query("SELECT SUM(total_amount) as total FROM transactions WHERE payment_status='paid'")->fetch_assoc()['total'] ?? 0;
+$result = mysqli_query($conn, "SELECT COUNT(*) as count FROM users");
+$total_users = mysqli_fetch_assoc($result)['count'];
+
+$result = mysqli_query($conn, "SELECT COUNT(*) as count FROM bookings");
+$total_bookings = mysqli_fetch_assoc($result)['count'];
+
+$result = mysqli_query($conn, "SELECT COUNT(*) as count FROM bookings WHERE status='pending'");
+$pending_bookings = mysqli_fetch_assoc($result)['count'];
+
+$result = mysqli_query($conn, "SELECT SUM(total_amount) as total FROM transactions WHERE payment_status='paid'");
+$total_revenue = mysqli_fetch_assoc($result)['total'] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="th">

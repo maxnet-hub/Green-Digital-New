@@ -64,6 +64,7 @@ $result = mysqli_query($conn, $sql);
                                 <th width="60">#</th>
                                 <th>ชื่อประเภท</th>
                                 <th>รายละเอียด</th>
+                                <th width="150">CO2 ที่ลดได้/kg</th>
                                 <th width="120">สถานะ</th>
                                 <th width="150" class="text-center">จัดการ</th>
                             </tr>
@@ -75,6 +76,9 @@ $result = mysqli_query($conn, $sql);
                                         <td><?php echo $i++; ?></td>
                                         <td><strong><?php echo $type['type_name']; ?></strong></td>
                                         <td><?php echo $type['description']; ?></td>
+                                        <td>
+                                            <span class="text-success">🌱 <?php echo number_format($type['co2_reduction'], 2); ?> kg</span>
+                                        </td>
                                         <td>
                                             <?php if($type['status'] == 'active'): ?>
                                                 <span class="badge bg-success">ใช้งาน</span>
@@ -91,7 +95,7 @@ $result = mysqli_query($conn, $sql);
                                 <?php endwhile; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted">ยังไม่มีข้อมูลประเภทขยะ</td>
+                                    <td colspan="6" class="text-center text-muted">ยังไม่มีข้อมูลประเภทขยะ</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -123,6 +127,12 @@ $result = mysqli_query($conn, $sql);
                             <tr>
                                 <th>รายละเอียด:</th>
                                 <td><?php echo $type['description']; ?></td>
+                            </tr>
+                            <tr>
+                                <th>CO2 ที่ลดได้:</th>
+                                <td>
+                                    <span class="text-success">🌱 <?php echo number_format($type['co2_reduction'], 2); ?> kg CO2/kg</span>
+                                </td>
                             </tr>
                             <tr>
                                 <th>สถานะ:</th>
@@ -160,6 +170,11 @@ $result = mysqli_query($conn, $sql);
                                 <textarea name="description" class="form-control" rows="3"><?php echo $type['description']; ?></textarea>
                             </div>
                             <div class="mb-3">
+                                <label class="form-label">CO2 ที่ลดได้ (kg CO2/kg) <span class="text-danger">*</span></label>
+                                <input type="number" name="co2_reduction" class="form-control" step="0.01" min="0" value="<?php echo $type['co2_reduction']; ?>" required placeholder="0.00">
+                                <small class="text-muted">ระบุปริมาณ CO2 ที่ลดได้ต่อ 1 กิโลกรัม</small>
+                            </div>
+                            <div class="mb-3">
                                 <label class="form-label">สถานะ <span class="text-danger">*</span></label>
                                 <select name="status" class="form-select" required>
                                     <option value="active" <?php if($type['status']=='active') echo 'selected'; ?>>ใช้งาน</option>
@@ -194,6 +209,11 @@ $result = mysqli_query($conn, $sql);
                         <div class="mb-3">
                             <label class="form-label">รายละเอียด</label>
                             <textarea name="description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">CO2 ที่ลดได้ (kg CO2/kg) <span class="text-danger">*</span></label>
+                            <input type="number" name="co2_reduction" class="form-control" step="0.01" min="0" value="0.00" required placeholder="0.00">
+                            <small class="text-muted">ระบุปริมาณ CO2 ที่ลดได้ต่อ 1 กิโลกรัม</small>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">สถานะ <span class="text-danger">*</span></label>

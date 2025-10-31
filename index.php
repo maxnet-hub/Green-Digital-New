@@ -246,7 +246,7 @@ $reviews = mysqli_query($conn, $reviews_sql);
     </style>
 </head>
 <body>
-    <?php include 'includes/navbar.php'; ?>
+    <?php include 'navbar.php'; ?>
 
     <!-- Hero Section -->
     <section class="hero-section" id="home">
@@ -465,7 +465,7 @@ $reviews = mysqli_query($conn, $reviews_sql);
         </div>
     </section>
 
-    <?php include 'includes/footer.php'; ?>
+    <?php include 'footer.php'; ?>
 
     <script src="js/bootstrap.bundle.min.js"></script>
 </body>

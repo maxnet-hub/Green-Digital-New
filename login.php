@@ -21,7 +21,14 @@
             <div class="login-body">
                 <?php if (isset($_GET['error'])): ?>
                     <div class="alert alert-danger" role="alert">
-                        <strong>ผิดพลาด!</strong> ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง
+                        <strong>ผิดพลาด!</strong>
+                        <?php
+                        if ($_GET['error'] == 'suspended') {
+                            echo 'บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ';
+                        } else {
+                            echo 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง';
+                        }
+                        ?>
                     </div>
                 <?php endif; ?>
 

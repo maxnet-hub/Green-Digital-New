@@ -9,25 +9,33 @@ $current_page = 'articles';
 // รับค่า category จาก URL
 $category_filter = isset($_GET['category']) ? $_GET['category'] : '';
 
-// ดึงบทความที่ published
+// ดึงบทความที่ published และอยู่ในช่วงเวลาแสดงผล
+$where_clause = "a.status = 'published'
+                 AND NOW() >= a.published_start
+                 AND (a.published_end IS NULL OR NOW() <= a.published_end)";
+
 if (!empty($category_filter)) {
+    $category_escaped = mysqli_real_escape_string($conn, $category_filter);
     $sql = "SELECT a.*, ad.full_name as author_name
             FROM articles a
             LEFT JOIN admins ad ON a.author_id = ad.admin_id
-            WHERE a.status = 'published' AND a.category = '$category_filter'
+            WHERE $where_clause AND a.category = '$category_escaped'
             ORDER BY a.published_at DESC";
 } else {
     $sql = "SELECT a.*, ad.full_name as author_name
             FROM articles a
             LEFT JOIN admins ad ON a.author_id = ad.admin_id
-            WHERE a.status = 'published'
+            WHERE $where_clause
             ORDER BY a.published_at DESC";
 }
 
 $articles_result = mysqli_query($conn, $sql);
 
-// ดึง category ทั้งหมด
-$category_sql = "SELECT DISTINCT category FROM articles WHERE status = 'published' AND category IS NOT NULL ORDER BY category";
+// ดึง category ทั้งหมด (เฉพาะบทความที่แสดงผลได้)
+$category_sql = "SELECT DISTINCT category
+                 FROM articles
+                 WHERE $where_clause AND category IS NOT NULL
+                 ORDER BY category";
 $categories = mysqli_query($conn, $category_sql);
 ?>
 <!DOCTYPE html>
@@ -148,7 +156,7 @@ $categories = mysqli_query($conn, $category_sql);
     </style>
 </head>
 <body>
-    <?php include 'includes/navbar.php'; ?>
+    <?php include 'navbar.php'; ?>
 
     <!-- Page Header -->
     <section class="page-header">
@@ -233,7 +241,7 @@ $categories = mysqli_query($conn, $category_sql);
         </div>
     </div>
 
-    <?php include 'includes/footer.php'; ?>
+    <?php include 'footer.php'; ?>
 
     <script src="js/bootstrap.bundle.min.js"></script>
 </body>

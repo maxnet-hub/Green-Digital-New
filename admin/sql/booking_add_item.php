@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once '../../config.php';
 
 // ตรวจสอบว่า login แล้วหรือยัง
@@ -34,19 +33,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $type_sql = "SELECT p.price_per_kg, rt.co2_reduction
                  FROM recycle_types rt
                  LEFT JOIN prices p ON rt.type_id = p.type_id AND p.is_current = TRUE
-                 WHERE rt.type_id = ?";
-    $stmt = $conn->prepare($type_sql);
-    $stmt->bind_param('i', $type_id);
-    $stmt->execute();
-    $type_result = $stmt->get_result();
+                 WHERE rt.type_id = $type_id";
+    $type_result = mysqli_query($conn, $type_sql);
 
-    if ($type_result->num_rows == 0) {
+    if (mysqli_num_rows($type_result) == 0) {
         $_SESSION['error'] = 'ไม่พบประเภทขยะนี้';
         header("Location: ../booking_detail.php?id=$booking_id");
         exit();
     }
 
-    $type_data = $type_result->fetch_assoc();
+    $type_data = mysqli_fetch_assoc($type_result);
     $price_per_kg = $type_data['price_per_kg'];
 
     // เช็คว่ามีราคาหรือไม่
@@ -61,43 +57,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // เพิ่มข้อมูลลงในตาราง booking_items
     $insert_sql = "INSERT INTO booking_items (booking_id, type_id, quantity, price_per_kg, subtotal)
-                   VALUES (?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($insert_sql);
-    $stmt->bind_param('iiddd', $booking_id, $type_id, $quantity, $price_per_kg, $subtotal);
+                   VALUES ($booking_id, $type_id, $quantity, $price_per_kg, $subtotal)";
+    $result = mysqli_query($conn, $insert_sql);
 
-    if ($stmt->execute()) {
+    if ($result) {
         // อัพเดท transactions ถ้ามี
-        $trans_check = "SELECT transaction_id FROM transactions WHERE booking_id = ? LIMIT 1";
-        $stmt_trans = $conn->prepare($trans_check);
-        $stmt_trans->bind_param('i', $booking_id);
-        $stmt_trans->execute();
-        $trans_result = $stmt_trans->get_result();
+        $trans_check = "SELECT transaction_id FROM transactions WHERE booking_id = $booking_id LIMIT 1";
+        $trans_result = mysqli_query($conn, $trans_check);
 
-        if ($trans_result->num_rows > 0) {
+        if (mysqli_num_rows($trans_result) > 0) {
             // คำนวณยอดรวมใหม่
-            $total_sql = "SELECT SUM(subtotal) as total_amount FROM booking_items WHERE booking_id = ?";
-            $stmt_total = $conn->prepare($total_sql);
-            $stmt_total->bind_param('i', $booking_id);
-            $stmt_total->execute();
-            $total_result = $stmt_total->get_result();
-            $total_data = $total_result->fetch_assoc();
+            $total_sql = "SELECT SUM(subtotal) as total_amount FROM booking_items WHERE booking_id = $booking_id";
+            $total_result = mysqli_query($conn, $total_sql);
+            $total_data = mysqli_fetch_assoc($total_result);
             $new_total = $total_data['total_amount'];
 
             // อัพเดท transaction
-            $update_trans = "UPDATE transactions SET total_amount = ? WHERE booking_id = ?";
-            $stmt_update_trans = $conn->prepare($update_trans);
-            $stmt_update_trans->bind_param('di', $new_total, $booking_id);
-            $stmt_update_trans->execute();
+            $update_trans = "UPDATE transactions SET total_amount = $new_total WHERE booking_id = $booking_id";
+            mysqli_query($conn, $update_trans);
         }
 
         $_SESSION['success'] = 'เพิ่มรายการสำเร็จ';
     } else {
-        $_SESSION['error'] = 'เกิดข้อผิดพลาด: ' . $conn->error;
+        $_SESSION['error'] = 'เกิดข้อผิดพลาด: ' . mysqli_error($conn);
     }
-
-    // ปิดการเชื่อมต่อ
-    $stmt->close();
-    $conn->close();
 
     // Redirect กลับหน้าเดิม
     header("Location: ../booking_detail.php?id=$booking_id");
