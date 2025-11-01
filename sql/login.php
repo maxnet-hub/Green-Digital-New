@@ -3,18 +3,15 @@ require_once '../config.php';
 
 // ตรวจสอบว่ามีการส่งข้อมูลมาหรือไม่
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = $_POST['username'];
+    $username = mysqli_real_escape_string($conn, $_POST['username']);
     $password = $_POST['password'];
 
     // ดึงข้อมูล admin จากฐานข้อมูล (รวมสถานะ)
-    $sql = "SELECT admin_id, username, password, full_name, role, status FROM admins WHERE username = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $sql = "SELECT admin_id, username, password, full_name, role, status FROM admins WHERE username = '$username'";
+    $result = mysqli_query($conn, $sql);
 
-    if ($result->num_rows > 0) {
-        $admin = $result->fetch_assoc();
+    if ($result && mysqli_num_rows($result) > 0) {
+        $admin = mysqli_fetch_assoc($result);
 
         // ตรวจสอบสถานะบัญชี
         if (isset($admin['status']) && $admin['status'] == 'suspended') {
