@@ -18,7 +18,6 @@ $current_page = 'reset_password';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ตั้งรหัสผ่านใหม่ - Green Digital</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/style.css">
     <style>
         .reset-wrapper {
             min-height: 100vh;

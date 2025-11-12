@@ -4,249 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coding Guidelines - โครงสร้างโค้ดแพลตฟอร์มรีไซเคิล</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Sarabun', 'Courier New', monospace;
-            line-height: 1.6;
-            color: #333;
-            background: #f5f7fa;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        
-        h1 {
-            color: #10b981;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            border-bottom: 4px solid #10b981;
-            padding-bottom: 10px;
-        }
-        
-        h2 {
-            color: #059669;
-            font-size: 1.8em;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            border-left: 5px solid #10b981;
-            padding-left: 15px;
-        }
-        
-        h3 {
-            color: #0891b2;
-            font-size: 1.3em;
-            margin-top: 20px;
-            margin-bottom: 10px;
-        }
-        
-        .intro {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-        }
-        
-        .intro h3 {
-            color: white;
-            margin-top: 0;
-        }
-        
-        .tech-stack {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-        
-        .tech-item {
-            background: #f0fdf4;
-            border: 2px solid #10b981;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: bold;
-        }
-        
-        .folder-structure {
-            background: #f9fafb;
-            border: 2px solid #e5e7eb;
-            padding: 20px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            margin: 20px 0;
-        }
-        
-        .folder-structure pre {
-            margin: 0;
-            line-height: 1.8;
-        }
-        
-        .code-block {
-            background: #1e293b;
-            color: #e2e8f0;
-            padding: 20px;
-            border-radius: 8px;
-            overflow-x: auto;
-            margin: 15px 0;
-            position: relative;
-        }
-        
-        .code-block::before {
-            content: attr(data-lang);
-            position: absolute;
-            top: 5px;
-            right: 10px;
-            background: #10b981;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 4px;
-            font-size: 0.8em;
-            font-weight: bold;
-        }
-        
-        .code-block pre {
-            margin: 0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            line-height: 1.6;
-        }
-        
-        .keyword { color: #c792ea; }
-        .string { color: #c3e88d; }
-        .function { color: #82aaff; }
-        .variable { color: #f07178; }
-        .comment { color: #676e95; font-style: italic; }
-        
-        .flow-diagram {
-            background: white;
-            border: 3px solid #10b981;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-        
-        .flow-step {
-            background: #f0fdf4;
-            border-left: 4px solid #10b981;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 4px;
-        }
-        
-        .flow-arrow {
-            text-align: center;
-            color: #10b981;
-            font-size: 1.5em;
-            margin: 5px 0;
-        }
-        
-        .warning {
-            background: #fef3c7;
-            border-left: 4px solid #f59e0b;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 4px;
-        }
-        
-        .warning strong {
-            color: #92400e;
-        }
-        
-        .tips {
-            background: #dbeafe;
-            border-left: 4px solid #3b82f6;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 4px;
-        }
-        
-        .tips strong {
-            color: #1e40af;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border: 1px solid #e5e7eb;
-        }
-        
-        th {
-            background: #10b981;
-            color: white;
-            font-weight: bold;
-        }
-        
-        tr:nth-child(even) {
-            background: #f9fafb;
-        }
-        
-        .example-box {
-            background: #fffbeb;
-            border: 2px solid #fbbf24;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-        
-        .example-box h4 {
-            color: #92400e;
-            margin-bottom: 10px;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>📘 Coding Guidelines</h1>
-        <p style="color: #666; font-size: 1.1em; margin-bottom: 20px;">
-            แนวทางการเขียนโค้ดแพลตฟอร์มรับซื้อขยะรีไซเคิล - เข้าใจง่าย จำง่าย สำหรับนักเรียน
-        </p>
+        <div class="card shadow-lg mb-4">
+            <div class="card-body p-4">
+                <div class="text-center mb-4 pb-3 border-bottom border-4 border-primary">
+                    <h1 class="text-primary display-4 fw-bold mb-3">📘 Coding Guidelines</h1>
+                    <p class="lead">แนวทางการเขียนโค้ดแพลตฟอร์มรับซื้อขยะรีไซเคิล - เข้าใจง่าย จำง่าย สำหรับนักเรียน</p>
+                </div>
 
-        <!-- Intro -->
-        <div class="intro">
-            <h3>🎯 หลักการสำคัญ</h3>
-            <ul>
-                <li>โค้ดเรียบง่าย ไม่ซับซ้อน</li>
-                <li>ใช้โครงสร้างไฟล์ที่เป็นระเบียบ</li>
-                <li>แยกส่วน HTML, PHP, และ SQL ให้ชัดเจน</li>
-                <li>ใช้ Session และ Alert สำหรับ Feedback</li>
-            </ul>
-        </div>
+                <!-- Intro -->
+                <div class="alert alert-primary mb-4">
+                    <h3 class="alert-heading">🎯 หลักการสำคัญ</h3>
+                    <ul class="mb-0">
+                        <li>โค้ดเรียบง่าย ไม่ซับซ้อน</li>
+                        <li>ใช้โครงสร้างไฟล์ที่เป็นระเบียบ</li>
+                        <li>แยกส่วน HTML, PHP, และ SQL ให้ชัดเจน</li>
+                        <li>ใช้ Session และ Alert สำหรับ Feedback</li>
+                    </ul>
+                </div>
 
-        <!-- Tech Stack -->
-        <h2>🛠️ เทคโนโลยีที่ใช้</h2>
-        <div class="tech-stack">
-            <div class="tech-item">HTML 5</div>
-            <div class="tech-item">PHP 8.x</div>
-            <div class="tech-item">MySQL</div>
-            <div class="tech-item">Bootstrap 5</div>
-            <div class="tech-item">mysqli</div>
-            <div class="tech-item">Session</div>
-        </div>
+                <!-- Tech Stack -->
+                <h2 class="mb-4">🛠️ เทคโนโลยีที่ใช้</h2>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4 col-lg-2">
+                        <div class="card bg-light border-2 border-primary text-center p-3">
+                            <div class="fw-bold">HTML 5</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-lg-2">
+                        <div class="card bg-light border-2 border-primary text-center p-3">
+                            <div class="fw-bold">PHP 8.x</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-lg-2">
+                        <div class="card bg-light border-2 border-primary text-center p-3">
+                            <div class="fw-bold">MySQL</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-lg-2">
+                        <div class="card bg-light border-2 border-primary text-center p-3">
+                            <div class="fw-bold">Bootstrap 5</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-lg-2">
+                        <div class="card bg-light border-2 border-primary text-center p-3">
+                            <div class="fw-bold">mysqli</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-lg-2">
+                        <div class="card bg-light border-2 border-primary text-center p-3">
+                            <div class="fw-bold">Session</div>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- Folder Structure -->
-        <h2>📁 โครงสร้างโฟลเดอร์</h2>
-        <div class="folder-structure">
-            <pre>
+                <!-- Folder Structure -->
+                <h2 class="mb-4">📁 โครงสร้างโฟลเดอร์</h2>
+                <div class="card bg-light border-2 border-secondary mb-4">
+                    <div class="card-body">
+                        <pre class="mb-0 font-monospace">
 project/
 │
 ├── index.php                 # หน้าแรก
@@ -283,355 +102,335 @@ project/
     ├── css/
     ├── js/
     └── images/
-            </pre>
-        </div>
+                        </pre>
+                    </div>
+                </div>
 
-        <!-- Database Connection -->
-        <h2>🔌 1. ไฟล์เชื่อมต่อฐานข้อมูล (config.php)</h2>
-        
-        <div class="code-block" data-lang="PHP">
-            <pre><span class="comment">// config.php - วางไว้ที่ root</span>
-<span class="keyword">&lt;?php</span>
-<span class="comment">// ข้อมูลเชื่อมต่อฐานข้อมูล</span>
-<span class="variable">$servername</span> = <span class="string">"localhost"</span>;
-<span class="variable">$username</span> = <span class="string">"root"</span>;
-<span class="variable">$password</span> = <span class="string">""</span>;
-<span class="variable">$dbname</span> = <span class="string">"recycle_db"</span>;
+                <!-- Database Connection -->
+                <h2 class="mb-4">🔌 1. ไฟล์เชื่อมต่อฐานข้อมูล (config.php)</h2>
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">PHP</h5>
+                    </div>
+                    <div class="card-body">
+                        <pre class="mb-0 font-monospace"><span class="text-success">// config.php - วางไว้ที่ root</span>
+<?php
+<span class="text-success">// ข้อมูลเชื่อมต่อฐานข้อมูล</span>
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "recycle_db";
 
-<span class="comment">// สร้างการเชื่อมต่อ</span>
-<span class="variable">$conn</span> = <span class="function">mysqli_connect</span>(<span class="variable">$servername</span>, <span class="variable">$username</span>, <span class="variable">$password</span>, <span class="variable">$dbname</span>);
+<span class="text-success">// สร้างการเชื่อมต่อ</span>
+$conn = mysqli_connect($servername, $username, $password, $dbname);
 
-<span class="comment">// ตั้งค่า charset เป็น UTF-8 (รองรับภาษาไทย)</span>
-<span class="function">mysqli_set_charset</span>(<span class="variable">$conn</span>, <span class="string">"utf8"</span>);
+<span class="text-success">// ตั้งค่า charset เป็น UTF-8 (รองรับภาษาไทย)</span>
+mysqli_set_charset($conn, "utf8");
 
-<span class="comment">// เช็คการเชื่อมต่อ</span>
-<span class="keyword">if</span> (!<span class="variable">$conn</span>) {
-    <span class="function">die</span>(<span class="string">"Connection failed: "</span> . <span class="function">mysqli_connect_error</span>());
+<span class="text-success">// เช็คการเชื่อมต่อ</span>
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
 }
-<span class="keyword">?&gt;</span></pre>
+?></pre>
+                    </div>
+                </div>
+
+                <!-- HTML Form Structure -->
+                <h2 class="mb-4">📝 2. โครงสร้างหน้า HTML + Form</h2>
+
+                <h3 class="mb-3">ตัวอย่าง: หน้าสมัครสมาชิก (user/register.php)</h3>
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">HTML/PHP</h5>
+                    </div>
+                    <div class="card-body">
+                        <pre class="mb-0 font-monospace"><?php 
+session_start(); 
+?>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สมัครสมาชิก</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
+          rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2>สมัครสมาชิก</h2>
+    
+    <!-- ส่งแบบ POST ไปยัง sql/register_db.php -->
+    <form action="sql/register_db.php" method="POST">
+        
+        <div class="mb-3">
+            <label>อีเมล</label>
+            <input type="email" name="email" class="form-control" required>
         </div>
 
-        <!-- HTML Form Structure -->
-        <h2>📝 2. โครงสร้างหน้า HTML + Form</h2>
-
-        <h3>ตัวอย่าง: หน้าสมัครสมาชิก (user/register.php)</h3>
-        
-        <div class="code-block" data-lang="HTML/PHP">
-            <pre><span class="keyword">&lt;?php</span> 
-<span class="function">session_start</span>(); 
-<span class="keyword">?&gt;</span>
-<span class="keyword">&lt;!DOCTYPE html&gt;</span>
-<span class="keyword">&lt;html</span> <span class="variable">lang</span>=<span class="string">"th"</span><span class="keyword">&gt;</span>
-<span class="keyword">&lt;head&gt;</span>
-    <span class="keyword">&lt;meta</span> <span class="variable">charset</span>=<span class="string">"UTF-8"</span><span class="keyword">&gt;</span>
-    <span class="keyword">&lt;meta</span> <span class="variable">name</span>=<span class="string">"viewport"</span> <span class="variable">content</span>=<span class="string">"width=device-width, initial-scale=1.0"</span><span class="keyword">&gt;</span>
-    <span class="keyword">&lt;title&gt;</span>สมัครสมาชิก<span class="keyword">&lt;/title&gt;</span>
-    
-    <span class="comment">&lt;!-- Bootstrap 5 CSS --&gt;</span>
-    <span class="keyword">&lt;link</span> <span class="variable">href</span>=<span class="string">"https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"</span> 
-          <span class="variable">rel</span>=<span class="string">"stylesheet"</span><span class="keyword">&gt;</span>
-<span class="keyword">&lt;/head&gt;</span>
-<span class="keyword">&lt;body&gt;</span>
-
-<span class="keyword">&lt;div</span> <span class="variable">class</span>=<span class="string">"container mt-5"</span><span class="keyword">&gt;</span>
-    <span class="keyword">&lt;h2&gt;</span>สมัครสมาชิก<span class="keyword">&lt;/h2&gt;</span>
-    
-    <span class="comment">&lt;!-- ส่งแบบ POST ไปยัง sql/register_db.php --&gt;</span>
-    <span class="keyword">&lt;form</span> <span class="variable">action</span>=<span class="string">"sql/register_db.php"</span> <span class="variable">method</span>=<span class="string">"POST"</span><span class="keyword">&gt;</span>
-        
-        <span class="keyword">&lt;div</span> <span class="variable">class</span>=<span class="string">"mb-3"</span><span class="keyword">&gt;</span>
-            <span class="keyword">&lt;label&gt;</span>อีเมล<span class="keyword">&lt;/label&gt;</span>
-            <span class="keyword">&lt;input</span> <span class="variable">type</span>=<span class="string">"email"</span> <span class="variable">name</span>=<span class="string">"email"</span> <span class="variable">class</span>=<span class="string">"form-control"</span> <span class="variable">required</span><span class="keyword">&gt;</span>
-        <span class="keyword">&lt;/div&gt;</span>
-
-        <span class="keyword">&lt;div</span> <span class="variable">class</span>=<span class="string">"mb-3"</span><span class="keyword">&gt;</span>
-            <span class="keyword">&lt;label&gt;</span>รหัสผ่าน<span class="keyword">&lt;/label&gt;</span>
-            <span class="keyword">&lt;input</span> <span class="variable">type</span>=<span class="string">"password"</span> <span class="variable">name</span>=<span class="string">"password"</span> <span class="variable">class</span>=<span class="string">"form-control"</span> <span class="variable">required</span><span class="keyword">&gt;</span>
-        <span class="keyword">&lt;/div&gt;</span>
-
-        <span class="keyword">&lt;div</span> <span class="variable">class</span>=<span class="string">"mb-3"</span><span class="keyword">&gt;</span>
-            <span class="keyword">&lt;label&gt;</span>ชื่อจริง<span class="keyword">&lt;/label&gt;</span>
-            <span class="keyword">&lt;input</span> <span class="variable">type</span>=<span class="string">"text"</span> <span class="variable">name</span>=<span class="string">"first_name"</span> <span class="variable">class</span>=<span class="string">"form-control"</span> <span class="variable">required</span><span class="keyword">&gt;</span>
-        <span class="keyword">&lt;/div&gt;</span>
-
-        <span class="keyword">&lt;button</span> <span class="variable">type</span>=<span class="string">"submit"</span> <span class="variable">class</span>=<span class="string">"btn btn-primary"</span><span class="keyword">&gt;</span>สมัครสมาชิก<span class="keyword">&lt;/button&gt;</span>
-    <span class="keyword">&lt;/form&gt;</span>
-<span class="keyword">&lt;/div&gt;</span>
-
-<span class="comment">&lt;!-- แสดง Alert ถ้ามี Session --&gt;</span>
-<span class="keyword">&lt;?php</span> <span class="keyword">if</span> (<span class="function">isset</span>(<span class="variable">$_SESSION</span>[<span class="string">'success'</span>])) { <span class="keyword">?&gt;</span>
-    <span class="keyword">&lt;script&gt;</span>
-        <span class="function">alert</span>(<span class="string">"<?php echo $_SESSION['success']; ?>"</span>);
-    <span class="keyword">&lt;/script&gt;</span>
-    <span class="keyword">&lt;?php</span> <span class="function">unset</span>(<span class="variable">$_SESSION</span>[<span class="string">'success'</span>]); <span class="keyword">?&gt;</span>
-<span class="keyword">&lt;?php</span> } <span class="keyword">?&gt;</span>
-
-<span class="keyword">&lt;?php</span> <span class="keyword">if</span> (<span class="function">isset</span>(<span class="variable">$_SESSION</span>[<span class="string">'error'</span>])) { <span class="keyword">?&gt;</span>
-    <span class="keyword">&lt;script&gt;</span>
-        <span class="function">alert</span>(<span class="string">"<?php echo $_SESSION['error']; ?>"</span>);
-    <span class="keyword">&lt;/script&gt;</span>
-    <span class="keyword">&lt;?php</span> <span class="function">unset</span>(<span class="variable">$_SESSION</span>[<span class="string">'error'</span>]); <span class="keyword">?&gt;</span>
-<span class="keyword">&lt;?php</span> } <span class="keyword">?&gt;</span>
-
-<span class="keyword">&lt;/body&gt;</span>
-<span class="keyword">&lt;/html&gt;</span></pre>
+        <div class="mb-3">
+            <label>รหัสผ่าน</label>
+            <input type="password" name="password" class="form-control" required>
         </div>
 
-        <!-- PHP Processing File -->
-        <h2>⚙️ 3. ไฟล์ประมวลผล PHP (ใน /sql)</h2>
+        <div class="mb-3">
+            <label>ชื่อจริง</label>
+            <input type="text" name="first_name" class="form-control" required>
+        </div>
 
-        <h3>ตัวอย่าง: ประมวลผลสมัครสมาชิก (user/sql/register_db.php)</h3>
+        <button type="submit" class="btn btn-primary">สมัครสมาชิก</button>
+    </form>
+</div>
 
-        <div class="code-block" data-lang="PHP">
-            <pre><span class="keyword">&lt;?php</span>
-<span class="function">session_start</span>();
-<span class="keyword">require_once</span> <span class="string">'../../config.php'</span>; <span class="comment">// เชื่อมต่อฐานข้อมูล</span>
+<!-- แสดง Alert ถ้ามี Session -->
+<?php if (isset($_SESSION['success'])) { ?>
+    <script>
+        alert("<?php echo $_SESSION['success']; ?>");
+    </script>
+    <?php unset($_SESSION['success']); ?>
+<?php } ?>
 
-<span class="comment">// เช็คว่ามีการส่งข้อมูลมาหรือไม่</span>
-<span class="keyword">if</span> (<span class="variable">$_SERVER</span>[<span class="string">'REQUEST_METHOD'</span>] == <span class="string">'POST'</span>) {
+<?php if (isset($_SESSION['error'])) { ?>
+    <script>
+        alert("<?php echo $_SESSION['error']; ?>");
+    </script>
+    <?php unset($_SESSION['error']); ?>
+<?php } ?>
+
+</body>
+</html></pre>
+                    </div>
+                </div>
+
+                <!-- PHP Processing File -->
+                <h2 class="mb-4">⚙️ 3. ไฟล์ประมวลผล PHP (ใน /sql)</h2>
+
+                <h3 class="mb-3">ตัวอย่าง: ประมวลผลสมัครสมาชิก (user/sql/register_db.php)</h3>
+
+                <div class="card mb-4">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">PHP</h5>
+                    </div>
+                    <div class="card-body">
+                        <pre class="mb-0 font-monospace"><?php
+session_start();
+require_once '../../config.php'; <span class="text-success">// เชื่อมต่อฐานข้อมูล</span>
+
+<span class="text-success">// เช็คว่ามีการส่งข้อมูลมาหรือไม่</span>
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
-    <span class="comment">// รับค่าจาก Form</span>
-    <span class="variable">$email</span> = <span class="variable">$_POST</span>[<span class="string">'email'</span>];
-    <span class="variable">$password</span> = <span class="variable">$_POST</span>[<span class="string">'password'</span>];
-    <span class="variable">$first_name</span> = <span class="variable">$_POST</span>[<span class="string">'first_name'</span>];
+    <span class="text-success">// รับค่าจาก Form</span>
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    $first_name = $_POST['first_name'];
     
-    <span class="comment">// เช็คค่า NULL</span>
-    <span class="keyword">if</span> (<span class="function">empty</span>(<span class="variable">$email</span>) || <span class="function">empty</span>(<span class="variable">$password</span>) || <span class="function">empty</span>(<span class="variable">$first_name</span>)) {
-        <span class="variable">$_SESSION</span>[<span class="string">'error'</span>] = <span class="string">"กรุณากรอกข้อมูลให้ครบถ้วน"</span>;
-        <span class="function">header</span>(<span class="string">"Location: ../register.php"</span>);
-        <span class="keyword">exit</span>();
+    <span class="text-success">// เช็คค่า NULL</span>
+    if (empty($email) || empty($password) || empty($first_name)) {
+        $_SESSION['error'] = "กรุณากรอกข้อมูลให้ครบถ้วน";
+        header("Location: ../register.php");
+        exit();
     }
     
-    <span class="comment">// เช็คว่าอีเมลซ้ำหรือไม่</span>
-    <span class="variable">$check_sql</span> = <span class="string">"SELECT * FROM users WHERE email = ?"</span>;
-    <span class="variable">$stmt</span> = <span class="function">mysqli_prepare</span>(<span class="variable">$conn</span>, <span class="variable">$check_sql</span>);
-    <span class="function">mysqli_stmt_bind_param</span>(<span class="variable">$stmt</span>, <span class="string">"s"</span>, <span class="variable">$email</span>);
-    <span class="function">mysqli_stmt_execute</span>(<span class="variable">$stmt</span>);
-    <span class="variable">$result</span> = <span class="function">mysqli_stmt_get_result</span>(<span class="variable">$stmt</span>);
+    <span class="text-success">// เช็คว่าอีเมลซ้ำหรือไม่</span>
+    $check_sql = "SELECT * FROM users WHERE email = ?";
+    $stmt = mysqli_prepare($conn, $check_sql);
+    mysqli_stmt_bind_param($stmt, "s", $email);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
     
-    <span class="keyword">if</span> (<span class="function">mysqli_num_rows</span>(<span class="variable">$result</span>) > 0) {
-        <span class="variable">$_SESSION</span>[<span class="string">'error'</span>] = <span class="string">"อีเมลนี้มีในระบบแล้ว"</span>;
-        <span class="function">header</span>(<span class="string">"Location: ../register.php"</span>);
-        <span class="keyword">exit</span>();
+    if (mysqli_num_rows($result) > 0) {
+        $_SESSION['error'] = "อีเมลนี้มีในระบบแล้ว";
+        header("Location: ../register.php");
+        exit();
     }
     
-    <span class="comment">// เข้ารหัสรหัสผ่าน</span>
-    <span class="variable">$hashed_password</span> = <span class="function">password_hash</span>(<span class="variable">$password</span>, PASSWORD_DEFAULT);
+    <span class="text-success">// เข้ารหัสรหัสผ่าน</span>
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
     
-    <span class="comment">// บันทึกข้อมูล</span>
-    <span class="variable">$sql</span> = <span class="string">"INSERT INTO users (email, password, first_name) VALUES (?, ?, ?)"</span>;
-    <span class="variable">$stmt</span> = <span class="function">mysqli_prepare</span>(<span class="variable">$conn</span>, <span class="variable">$sql</span>);
-    <span class="function">mysqli_stmt_bind_param</span>(<span class="variable">$stmt</span>, <span class="string">"sss"</span>, <span class="variable">$email</span>, <span class="variable">$hashed_password</span>, <span class="variable">$first_name</span>);
+    <span class="text-success">// บันทึกข้อมูล</span>
+    $sql = "INSERT INTO users (email, password, first_name) VALUES (?, ?, ?)";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "sss", $email, $hashed_password, $first_name);
     
-    <span class="keyword">if</span> (<span class="function">mysqli_stmt_execute</span>(<span class="variable">$stmt</span>)) {
-        <span class="comment">// สำเร็จ - ส่ง Session กลับไป</span>
-        <span class="variable">$_SESSION</span>[<span class="string">'success'</span>] = <span class="string">"สมัครสมาชิกสำเร็จ!"</span>;
-    } <span class="keyword">else</span> {
-        <span class="comment">// ล้มเหลว</span>
-        <span class="variable">$_SESSION</span>[<span class="string">'error'</span>] = <span class="string">"เกิดข้อผิดพลาด: "</span> . <span class="function">mysqli_error</span>(<span class="variable">$conn</span>);
+    if (mysqli_stmt_execute($stmt)) {
+        <span class="text-success">// สำเร็จ - ส่ง Session กลับไป</span>
+        $_SESSION['success'] = "สมัครสมาชิกสำเร็จ!";
+    } else {
+        <span class="text-success">// ล้มเหลว</span>
+        $_SESSION['error'] = "เกิดข้อผิดพลาด: " . mysqli_error($conn);
     }
     
-    <span class="comment">// ปิดการเชื่อมต่อ</span>
-    <span class="function">mysqli_stmt_close</span>(<span class="variable">$stmt</span>);
-    <span class="function">mysqli_close</span>(<span class="variable">$conn</span>);
+    <span class="text-success">// ปิดการเชื่อมต่อ</span>
+    mysqli_stmt_close($stmt);
+    mysqli_close($conn);
     
-    <span class="comment">// Redirect กลับหน้าเดิม</span>
-    <span class="function">header</span>(<span class="string">"Location: ../register.php"</span>);
-    <span class="keyword">exit</span>();
+    <span class="text-success">// Redirect กลับหน้าเดิม</span>
+    header("Location: ../register.php");
+    exit();
 }
-<span class="keyword">?&gt;</span></pre>
-        </div>
+?></pre>
+                    </div>
+                </div>
 
-        <!-- GET Link Example -->
-        <h2>🔗 4. การส่งค่าแบบ GET (Link)</h2>
+                <!-- GET Link Example -->
+                <h2 class="mb-4">🔗 4. การส่งค่าแบบ GET (Link)</h2>
 
-        <h3>ตัวอย่าง: ลบข้อมูล</h3>
+                <h3 class="mb-3">ตัวอย่าง: ลบข้อมูล</h3>
 
-        <div class="example-box">
-            <h4>หน้าแสดงรายการ (admin/manage_prices.php)</h4>
-            <div class="code-block" data-lang="HTML">
-                <pre><span class="comment">&lt;!-- ส่งค่า id ผ่าน GET --&gt;</span>
-<span class="keyword">&lt;a</span> <span class="variable">href</span>=<span class="string">"sql/delete_price.php?id=<?php echo $row['price_id']; ?>"</span> 
-   <span class="variable">class</span>=<span class="string">"btn btn-danger"</span>
-   <span class="variable">onclick</span>=<span class="string">"return confirm('ต้องการลบใช่หรือไม่?')"</span><span class="keyword">&gt;</span>
+                <div class="card mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">หน้าแสดงรายการ (admin/manage_prices.php)</h5>
+                    </div>
+                    <div class="card-body">
+                        <pre class="mb-0 font-monospace"><span class="text-success"><!-- ส่งค่า id ผ่าน GET --></span>
+<a href="sql/delete_price.php?id=<?php echo $row['price_id']; ?>" 
+   class="btn btn-danger"
+   onclick="return confirm('ต้องการลบใช่หรือไม่?')">
     ลบ
-<span class="keyword">&lt;/a&gt;</span></pre>
-            </div>
+</a></pre>
+                    </div>
+                </div>
 
-            <h4>ไฟล์ประมวลผล (admin/sql/delete_price.php)</h4>
-            <div class="code-block" data-lang="PHP">
-                <pre><span class="keyword">&lt;?php</span>
-<span class="function">session_start</span>();
-<span class="keyword">require_once</span> <span class="string">'../../config.php'</span>;
+                <div class="card mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">ไฟล์ประมวลผล (admin/sql/delete_price.php)</h5>
+                    </div>
+                    <div class="card-body">
+                        <pre class="mb-0 font-monospace"><?php
+session_start();
+require_once '../../config.php';
 
-<span class="comment">// รับค่า id จาก GET</span>
-<span class="keyword">if</span> (<span class="function">isset</span>(<span class="variable">$_GET</span>[<span class="string">'id'</span>])) {
-    <span class="variable">$id</span> = <span class="variable">$_GET</span>[<span class="string">'id'</span>];
+<span class="text-success">// รับค่า id จาก GET</span>
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
     
-    <span class="comment">// เช็คว่า id เป็นตัวเลขหรือไม่</span>
-    <span class="keyword">if</span> (!<span class="function">is_numeric</span>(<span class="variable">$id</span>)) {
-        <span class="variable">$_SESSION</span>[<span class="string">'error'</span>] = <span class="string">"ข้อมูลไม่ถูกต้อง"</span>;
-        <span class="function">header</span>(<span class="string">"Location: ../manage_prices.php"</span>);
-        <span class="keyword">exit</span>();
+    <span class="text-success">// เช็คว่า id เป็นตัวเลขหรือไม่</span>
+    if (!is_numeric($id)) {
+        $_SESSION['error'] = "ข้อมูลไม่ถูกต้อง";
+        header("Location: ../manage_prices.php");
+        exit();
     }
     
-    <span class="comment">// ลบข้อมูล</span>
-    <span class="variable">$sql</span> = <span class="string">"DELETE FROM prices WHERE price_id = ?"</span>;
-    <span class="variable">$stmt</span> = <span class="function">mysqli_prepare</span>(<span class="variable">$conn</span>, <span class="variable">$sql</span>);
-    <span class="function">mysqli_stmt_bind_param</span>(<span class="variable">$stmt</span>, <span class="string">"i"</span>, <span class="variable">$id</span>);
+    <span class="text-success">// ลบข้อมูล</span>
+    $sql = "DELETE FROM prices WHERE price_id = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $id);
     
-    <span class="keyword">if</span> (<span class="function">mysqli_stmt_execute</span>(<span class="variable">$stmt</span>)) {
-        <span class="variable">$_SESSION</span>[<span class="string">'success'</span>] = <span class="string">"ลบข้อมูลสำเร็จ"</span>;
-    } <span class="keyword">else</span> {
-        <span class="variable">$_SESSION</span>[<span class="string">'error'</span>] = <span class="string">"เกิดข้อผิดพลาด"</span>;
+    if (mysqli_stmt_execute($stmt)) {
+        $_SESSION['success'] = "ลบข้อมูลสำเร็จ";
+    } else {
+        $_SESSION['error'] = "เกิดข้อผิดพลาด";
     }
     
-    <span class="function">mysqli_stmt_close</span>(<span class="variable">$stmt</span>);
-    <span class="function">mysqli_close</span>(<span class="variable">$conn</span>);
+    mysqli_stmt_close($stmt);
+    mysqli_close($conn);
 }
 
-<span class="comment">// Redirect กลับหน้าเดิม</span>
-<span class="function">header</span>(<span class="string">"Location: ../manage_prices.php"</span>);
-<span class="keyword">exit</span>();
-<span class="keyword">?&gt;</span></pre>
-            </div>
-        </div>
+<span class="text-success">// Redirect กลับหน้าเดิม</span>
+header("Location: ../manage_prices.php");
+exit();
+?></pre>
+                    </div>
+                </div>
 
-        <!-- Flow Diagram -->
-        <h2>🔄 5. Flow การทำงาน</h2>
+                <!-- Guidelines Table -->
+                <h2 class="mb-4">📋 6. สรุปกฎการเขียนโค้ด</h2>
 
-        <div class="flow-diagram">
-            <div class="flow-step">
-                <strong>1. User กรอก Form</strong><br>
-                หน้า HTML มี Form ส่งค่าแบบ POST หรือ GET
-            </div>
-            <div class="flow-arrow">↓</div>
-            
-            <div class="flow-step">
-                <strong>2. ส่งข้อมูลไปยัง /sql</strong><br>
-                action="sql/ชื่อไฟล์.php" หรือ href="sql/ชื่อไฟล์.php?id=..."
-            </div>
-            <div class="flow-arrow">↓</div>
-            
-            <div class="flow-step">
-                <strong>3. ประมวลผลใน PHP</strong><br>
-                - เช็คค่า NULL<br>
-                - ติดต่อฐานข้อมูล (mysqli)<br>
-                - บันทึก/แก้ไข/ลบข้อมูล
-            </div>
-            <div class="flow-arrow">↓</div>
-            
-            <div class="flow-step">
-                <strong>4. เซ็ต Session</strong><br>
-                $_SESSION['success'] หรือ $_SESSION['error']
-            </div>
-            <div class="flow-arrow">↓</div>
-            
-            <div class="flow-step">
-                <strong>5. Redirect กลับหน้าเดิม</strong><br>
-                header("Location: ../หน้าเดิม.php");
-            </div>
-            <div class="flow-arrow">↓</div>
-            
-            <div class="flow-step">
-                <strong>6. แสดง Alert</strong><br>
-                JavaScript alert() แสดงข้อความจาก Session
-            </div>
-            <div class="flow-arrow">↓</div>
-            
-            <div class="flow-step">
-                <strong>7. ลบ Session</strong><br>
-                unset($_SESSION['success']); หรือ unset($_SESSION['error']);
-            </div>
-        </div>
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>หัวข้อ</th>
+                                <th>วิธีการ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>โครงสร้างโฟลเดอร์</td>
+                                <td>แยกเป็น user/, admin/, includes/, assets/</td>
+                            </tr>
+                            <tr>
+                                <td>ไฟล์ HTML</td>
+                                <td>วางไว้ที่ root ของแต่ละโฟลเดอร์</td>
+                            </tr>
+                            <tr>
+                                <td>ไฟล์ประมวลผล PHP</td>
+                                <td>วางในโฟลเดอร์ /sql ของหน้านั้นๆ</td>
+                            </tr>
+                            <tr>
+                                <td>Form ส่งค่า</td>
+                                <td>method="POST" action="sql/ชื่อไฟล์.php"</td>
+                            </tr>
+                            <tr>
+                                <td>Link ส่งค่า</td>
+                                <td>href="sql/ชื่อไฟล์.php?id=1"</td>
+                            </tr>
+                            <tr>
+                                <td>เชื่อมต่อ Database</td>
+                                <td>require_once '../../config.php'</td>
+                            </tr>
+                            <tr>
+                                <td>Query Database</td>
+                                <td>ใช้ mysqli_prepare และ mysqli_stmt_execute</td>
+                            </tr>
+                            <tr>
+                                <td>เช็คค่า NULL</td>
+                                <td>ใช้ empty() หรือ isset()</td>
+                            </tr>
+                            <tr>
+                                <td>Success/Error</td>
+                                <td>ใช้ $_SESSION['success'] หรือ $_SESSION['error']</td>
+                            </tr>
+                            <tr>
+                                <td>Redirect</td>
+                                <td>header("Location: ../หน้าเดิม.php"); exit();</td>
+                            </tr>
+                            <tr>
+                                <td>แสดง Alert</td>
+                                <td>JavaScript alert() + unset() Session</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-        <!-- Guidelines Table -->
-        <h2>📋 6. สรุปกฎการเขียนโค้ด</h2>
+                <!-- Warning -->
+                <div class="alert alert-danger mb-4">
+                    <strong>⚠️ ข้อควรระวัง:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>ต้อง <code>session_start()</code> ทุกหน้าที่ใช้ Session</li>
+                        <li>ต้อง <code>exit()</code> หลัง header() เสมอ</li>
+                        <li>ใช้ Prepared Statement (?) เพื่อป้องกัน SQL Injection</li>
+                        <li>เข้ารหัสรหัสผ่านด้วย password_hash()</li>
+                        <li>เช็คค่า NULL ก่อนบันทึกฐานข้อมูล</li>
+                    </ul>
+                </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>หัวข้อ</th>
-                    <th>วิธีการ</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>โครงสร้างโฟลเดอร์</td>
-                    <td>แยกเป็น user/, admin/, includes/, assets/</td>
-                </tr>
-                <tr>
-                    <td>ไฟล์ HTML</td>
-                    <td>วางไว้ที่ root ของแต่ละโฟลเดอร์</td>
-                </tr>
-                <tr>
-                    <td>ไฟล์ประมวลผล PHP</td>
-                    <td>วางในโฟลเดอร์ /sql ของหน้านั้นๆ</td>
-                </tr>
-                <tr>
-                    <td>Form ส่งค่า</td>
-                    <td>method="POST" action="sql/ชื่อไฟล์.php"</td>
-                </tr>
-                <tr>
-                    <td>Link ส่งค่า</td>
-                    <td>href="sql/ชื่อไฟล์.php?id=1"</td>
-                </tr>
-                <tr>
-                    <td>เชื่อมต่อ Database</td>
-                    <td>require_once '../../config.php'</td>
-                </tr>
-                <tr>
-                    <td>Query Database</td>
-                    <td>ใช้ mysqli_prepare และ mysqli_stmt_execute</td>
-                </tr>
-                <tr>
-                    <td>เช็คค่า NULL</td>
-                    <td>ใช้ empty() หรือ isset()</td>
-                </tr>
-                <tr>
-                    <td>Success/Error</td>
-                    <td>ใช้ $_SESSION['success'] หรือ $_SESSION['error']</td>
-                </tr>
-                <tr>
-                    <td>Redirect</td>
-                    <td>header("Location: ../หน้าเดิม.php"); exit();</td>
-                </tr>
-                <tr>
-                    <td>แสดง Alert</td>
-                    <td>JavaScript alert() + unset() Session</td>
-                </tr>
-            </tbody>
-        </table>
+                <!-- Tips -->
+                <div class="alert alert-info mb-4">
+                    <strong>💡 Tips สำหรับนักเรียน:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>เริ่มจากทำฟังก์ชันง่ายๆ ก่อน เช่น เพิ่ม/แสดงข้อมูล</li>
+                        <li>ทดสอบทีละไฟล์ เมื่อทำงานแล้วค่อยทำต่อ</li>
+                        <li>ใช้ <code>echo</code> หรือ <code>var_dump()</code> เพื่อ Debug</li>
+                        <li>ใช้ Bootstrap class เพื่อให้หน้าตาสวยโดยไม่ต้องเขียน CSS มาก</li>
+                        <li>ตั้งชื่อไฟล์และตัวแปรให้สื่อความหมาย</li>
+                    </ul>
+                </div>
 
-        <!-- Warning -->
-        <div class="warning">
-            <strong>⚠️ ข้อควรระวัง:</strong>
-            <ul style="margin: 10px 0 0 20px;">
-                <li>ต้อง <code>session_start()</code> ทุกหน้าที่ใช้ Session</li>
-                <li>ต้อง <code>exit()</code> หลัง header() เสมอ</li>
-                <li>ใช้ Prepared Statement (?) เพื่อป้องกัน SQL Injection</li>
-                <li>เข้ารหัสรหัสผ่านด้วย password_hash()</li>
-                <li>เช็คค่า NULL ก่อนบันทึกฐานข้อมูล</li>
-            </ul>
-        </div>
-
-        <!-- Tips -->
-        <div class="tips">
-            <strong>💡 Tips สำหรับนักเรียน:</strong>
-            <ul style="margin: 10px 0 0 20px;">
-                <li>เริ่มจากทำฟังก์ชันง่ายๆ ก่อน เช่น เพิ่ม/แสดงข้อมูล</li>
-                <li>ทดสอบทีละไฟล์ เมื่อทำงานแล้วค่อยทำต่อ</li>
-                <li>ใช้ <code>echo</code> หรือ <code>var_dump()</code> เพื่อ Debug</li>
-                <li>ใช้ Bootstrap class เพื่อให้หน้าตาสวยโดยไม่ต้องเขียน CSS มาก</li>
-                <li>ตั้งชื่อไฟล์และตัวแปรให้สื่อความหมาย</li>
-            </ul>
-        </div>
-
-        <!-- Footer -->
-        <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #666;">
-            <p><strong>Coding Guidelines</strong> - แพลตฟอร์มรับซื้อขยะรีไซเคิล</p>
-            <p style="font-size: 0.9em; margin-top: 10px;">เรียบง่าย จำง่าย ใช้งานง่าย 🚀</p>
+                <div class="text-center mt-4 pt-3 border-top">
+                    <p class="fw-bold">Coding Guidelines</p>
+                    <p>แพลตฟอร์มรับซื้อขยะรีไซเคิล</p>
+                    <p class="small text-muted mt-2">เรียบง่าย จำง่าย ใช้งานง่าย 🚀</p>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

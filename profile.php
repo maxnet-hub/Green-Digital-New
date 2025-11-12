@@ -21,7 +21,6 @@ $user = mysqli_fetch_assoc($user_result);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>โปรไฟล์ - Green Digital</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/style.css">
     <style>
         .badge-bronze { background: linear-gradient(135deg, #cd7f32 0%, #a0522d 100%); color: white; }
         .badge-silver { background: linear-gradient(135deg, #c0c0c0 0%, #808080 100%); color: white; }
@@ -61,7 +60,7 @@ $user = mysqli_fetch_assoc($user_result);
                 <div class="card">
                     <div class="card-body text-center">
                         <div class="mb-3">
-                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 100px; height: 100px; font-size: 48px;">
+                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center display-3" style="width: 100px; height: 100px;">
                                 👤
                             </div>
                         </div>

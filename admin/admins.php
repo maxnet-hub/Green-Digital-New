@@ -18,7 +18,6 @@ $result = mysqli_query($conn, $sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จัดการผู้ดูแลระบบ - Green Digital</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/style.css">
     <style>
         .bg-purple {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

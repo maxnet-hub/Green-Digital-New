@@ -41,13 +41,7 @@ $recent_transactions = mysqli_query($conn, $recent_transactions_sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Green Digital</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/style.css">
-    <style>
-        .badge-bronze { background: linear-gradient(135deg, #cd7f32 0%, #a0522d 100%); color: white; }
-        .badge-silver { background: linear-gradient(135deg, #c0c0c0 0%, #808080 100%); color: white; }
-        .badge-gold { background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #333; }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <?php include 'navbar.php'; ?>
@@ -61,9 +55,9 @@ $recent_transactions = mysqli_query($conn, $recent_transactions_sql);
                         <h3>สวัสดี, <?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?> 👋</h3>
                         <p class="mb-2">ระดับสมาชิก:
                             <?php
-                            $badge_class = 'badge-bronze';
-                            if($user['user_level'] == 'Silver') $badge_class = 'badge-silver';
-                            if($user['user_level'] == 'Gold') $badge_class = 'badge-gold';
+                            $badge_class = 'bg-secondary';
+                            if($user['user_level'] == 'Silver') $badge_class = 'bg-light text-dark';
+                            if($user['user_level'] == 'Gold') $badge_class = 'bg-warning text-dark';
                             ?>
                             <span class="badge <?php echo $badge_class; ?> fs-6"><?php echo $user['user_level']; ?></span>
                         </p>
@@ -76,31 +70,39 @@ $recent_transactions = mysqli_query($conn, $recent_transactions_sql);
         <!-- Statistics Cards -->
         <div class="row g-3 mb-4">
             <div class="col-md-3">
-                <div class="stat-card">
-                    <h6>📅 การจองทั้งหมด</h6>
-                    <div class="stat-number"><?php echo number_format($bookings); ?></div>
-                    <small class="text-muted">ครั้ง</small>
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h6>📅 การจองทั้งหมด</h6>
+                        <div class="display-6 fw-bold"><?php echo number_format($bookings); ?></div>
+                        <small class="text-muted">ครั้ง</small>
+                    </div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="stat-card">
-                    <h6>💰 รายได้ทั้งหมด</h6>
-                    <div class="stat-number text-success"><?php echo number_format($total_income, 2); ?></div>
-                    <small class="text-muted">บาท</small>
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h6>💰 รายได้ทั้งหมด</h6>
+                        <div class="display-6 fw-bold text-success"><?php echo number_format($total_income, 2); ?></div>
+                        <small class="text-muted">บาท</small>
+                    </div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="stat-card">
-                    <h6>♻️ ธุรกรรม</h6>
-                    <div class="stat-number"><?php echo number_format($transactions); ?></div>
-                    <small class="text-muted">ครั้ง</small>
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h6>♻️ ธุรกรรม</h6>
+                        <div class="display-6 fw-bold"><?php echo number_format($transactions); ?></div>
+                        <small class="text-muted">ครั้ง</small>
+                    </div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="stat-card">
-                    <h6>🌱 CO2 ที่ช่วยลด</h6>
-                    <div class="stat-number text-success"><?php echo number_format($co2_reduced, 2); ?></div>
-                    <small class="text-muted">kg</small>
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h6>🌱 CO2 ที่ช่วยลด</h6>
+                        <div class="display-6 fw-bold text-success"><?php echo number_format($co2_reduced, 2); ?></div>
+                        <small class="text-muted">kg</small>
+                    </div>
                 </div>
             </div>
         </div>
@@ -229,6 +231,6 @@ $recent_transactions = mysqli_query($conn, $recent_transactions_sql);
         </div>
     </div>
 
-    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

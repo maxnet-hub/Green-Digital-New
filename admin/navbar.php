@@ -1,5 +1,5 @@
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark dashboard-header sticky-top">
+<nav class="navbar navbar-expand-lg navbar-dark bg-success sticky-top shadow-sm">
     <div class="container-fluid">
         <a class="navbar-brand" href="dashboard.php">🌿 Green Digital</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -74,7 +74,7 @@
                             </span>
                         <?php endif; ?>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end" style="min-width: 350px; max-height: 400px; overflow-y: auto;">
+                    <ul class="dropdown-menu dropdown-menu-end overflow-auto">
                         <li><h6 class="dropdown-header">🔔 การแจ้งเตือน</h6></li>
                         <li><hr class="dropdown-divider"></li>
                         <?php if(mysqli_num_rows($notifications_result) > 0): ?>
@@ -89,7 +89,7 @@
                                 }
                             ?>
                             <li>
-                                <div class="dropdown-item" style="white-space: normal;">
+                                <div class="dropdown-item text-wrap">
                                     <div class="d-flex align-items-start">
                                         <span class="me-2"><?php echo $icon; ?></span>
                                         <div class="flex-grow-1">

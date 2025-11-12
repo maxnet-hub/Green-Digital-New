@@ -35,7 +35,6 @@ while ($type = mysqli_fetch_assoc($recycle_types)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>สร้างการจองใหม่ - Green Digital</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/style.css">
     <style>
         .recycle-type-card {
             border: 2px solid #e9ecef;

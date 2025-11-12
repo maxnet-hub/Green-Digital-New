@@ -54,7 +54,6 @@ $gold = mysqli_fetch_assoc($stats_result)['c'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จัดการสมาชิก - Green Digital</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/style.css">
     <style>
         .badge-bronze { background: linear-gradient(135deg, #cd7f32 0%, #a0522d 100%); color: white; }
         .badge-silver { background: linear-gradient(135deg, #c0c0c0 0%, #808080 100%); color: white; }
@@ -102,13 +101,13 @@ $gold = mysqli_fetch_assoc($stats_result)['c'];
             <div class="col-md-3">
                 <div class="stat-card">
                     <h6>🥉 Bronze</h6>
-                    <div class="stat-number" style="color: #cd7f32;"><?php echo number_format($bronze); ?></div>
+                    <div class="stat-number text-warning"><?php echo number_format($bronze); ?></div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-card">
                     <h6>🥈 Silver</h6>
-                    <div class="stat-number" style="color: #c0c0c0;"><?php echo number_format($silver); ?></div>
+                    <div class="stat-number text-secondary"><?php echo number_format($silver); ?></div>
                 </div>
             </div>
             <div class="col-md-3">

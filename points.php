@@ -49,7 +49,6 @@ mysqli_data_seek($points_transactions, 0);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แต้มสะสม - Green Digital</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/style.css">
     <style>
         .points-hero {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

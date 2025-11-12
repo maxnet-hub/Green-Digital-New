@@ -90,7 +90,6 @@ $related_articles = mysqli_query($conn, $related_sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($article['title']); ?> - Green Digital</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/style.css">
     <style>
         .article-header {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
@@ -266,7 +265,6 @@ $related_articles = mysqli_query($conn, $related_sql);
         }
 
         .reply-form {
-            display: none;
             margin-top: 15px;
             padding: 15px;
             background: #f9fafb;
@@ -422,7 +420,7 @@ $related_articles = mysqli_query($conn, $related_sql);
 
                                 <!-- ฟอร์มแก้ไข (ซ่อนไว้) -->
                                 <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $comment['user_id'] && $can_edit): ?>
-                                    <div class="reply-form" id="edit-form-<?php echo $comment['comment_id']; ?>">
+                                    <div class="reply-form d-none" id="edit-form-<?php echo $comment['comment_id']; ?>">
                                         <form method="POST" action="sql/comment_edit.php">
                                             <input type="hidden" name="comment_id" value="<?php echo $comment['comment_id']; ?>">
                                             <textarea name="comment_text" class="form-control mb-2" rows="3" required><?php echo htmlspecialchars($comment['comment_text']); ?></textarea>
@@ -434,7 +432,7 @@ $related_articles = mysqli_query($conn, $related_sql);
                                 <?php endif; ?>
 
                                 <!-- ฟอร์มตอบกลับ (ซ่อนไว้) -->
-                                <div class="reply-form" id="reply-form-<?php echo $comment['comment_id']; ?>">
+                                <div class="reply-form d-none" id="reply-form-<?php echo $comment['comment_id']; ?>">
                                     <?php if(isset($_SESSION['user_id']) || isset($_SESSION['admin_id'])): ?>
                                         <form method="POST" action="sql/comment_add.php">
                                             <input type="hidden" name="article_id" value="<?php echo $article_id; ?>">
@@ -500,7 +498,7 @@ $related_articles = mysqli_query($conn, $related_sql);
                                                 </div>
 
                                                 <?php if($can_edit_reply): ?>
-                                                    <div class="reply-form" id="edit-form-<?php echo $reply['comment_id']; ?>" style="margin-top: 10px;">
+                                                    <div class="reply-form d-none mt-2" id="edit-form-<?php echo $reply['comment_id']; ?>">
                                                         <form method="POST" action="sql/comment_edit.php">
                                                             <input type="hidden" name="comment_id" value="<?php echo $reply['comment_id']; ?>">
                                                             <textarea name="comment_text" class="form-control mb-2" rows="2" required><?php echo htmlspecialchars($reply['comment_text']); ?></textarea>
@@ -564,7 +562,7 @@ $related_articles = mysqli_query($conn, $related_sql);
                                          class="related-image">
                                 <?php else: ?>
                                     <div class="related-image d-flex align-items-center justify-content-center bg-light">
-                                        <span style="font-size: 2em;">📄</span>
+                                        <span class="fs-1">📄</span>
                                     </div>
                                 <?php endif; ?>
 
@@ -590,21 +588,13 @@ $related_articles = mysqli_query($conn, $related_sql);
         // Toggle Reply Form
         function toggleReplyForm(commentId) {
             const form = document.getElementById('reply-form-' + commentId);
-            if (form.style.display === 'none' || form.style.display === '') {
-                form.style.display = 'block';
-            } else {
-                form.style.display = 'none';
-            }
+            form.classList.toggle('d-none');
         }
 
         // Toggle Edit Form
         function toggleEditForm(commentId) {
             const form = document.getElementById('edit-form-' + commentId);
-            if (form.style.display === 'none' || form.style.display === '') {
-                form.style.display = 'block';
-            } else {
-                form.style.display = 'none';
-            }
+            form.classList.toggle('d-none');
         }
     </script>
 </body>

@@ -18,7 +18,6 @@ $result = mysqli_query($conn,$sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>การแจ้งเตือน - Green Digital Admin</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/style.css">
     <style>
         .notification-card {
             border-left: 4px solid #6c757d;
@@ -78,7 +77,7 @@ $result = mysqli_query($conn,$sql);
                     <div class="card notification-card <?php echo $type_class; ?> mb-3">
                         <div class="card-body">
                             <div class="d-flex">
-                                <div class="me-3" style="font-size: 2em;">
+                                <div class="me-3 fs-1">
                                     <?php echo $icon; ?>
                                 </div>
                                 <div class="flex-grow-1">

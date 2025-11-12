@@ -31,7 +31,6 @@ $transactions = mysqli_query($conn, $transactions_sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ประวัติธุรกรรม - Green Digital</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/style.css">
     <style>
         .transaction-card {
             border: 1px solid #dee2e6;
@@ -185,8 +184,8 @@ $transactions = mysqli_query($conn, $transactions_sql);
                                 <!-- Right: Amount & Action -->
                                 <div class="col-md-4">
                                     <div class="amount-box mb-3">
-                                        <div style="font-size: 0.9em; opacity: 0.9;">ยอดเงิน</div>
-                                        <div style="font-size: 2em; font-weight: bold;">
+                                        <div class="fs-6 opacity-75">ยอดเงิน</div>
+                                        <div class="fs-1 fw-bold">
                                             <?php echo number_format($trans['total_amount'], 2); ?> ฿
                                         </div>
                                     </div>
@@ -201,7 +200,7 @@ $transactions = mysqli_query($conn, $transactions_sql);
                 <?php else: ?>
                     <!-- Empty State -->
                     <div class="text-center py-5">
-                        <div style="font-size: 5em; opacity: 0.3;">💳</div>
+                        <div class="display-1 opacity-25">💳</div>
                         <h4 class="text-muted mt-3">ยังไม่มีธุรกรรม</h4>
                         <p class="text-muted">เมื่อคุณทำการขายขยะรีไซเคิลกับเรา<br>ประวัติธุรกรรมจะแสดงที่นี่</p>
                         <a href="booking_create.php" class="btn btn-primary mt-3">

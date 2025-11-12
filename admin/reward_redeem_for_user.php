@@ -66,7 +66,6 @@ if (!$rewards) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แลกของรางวัลให้ลูกค้า - Green Digital Admin</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/style.css">
     <style>
         .user-info-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

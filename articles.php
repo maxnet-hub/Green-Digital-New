@@ -45,7 +45,6 @@ $categories = mysqli_query($conn, $category_sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>บทความและความรู้ - Green Digital</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/style.css">
     <style>
         .page-header {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
@@ -194,7 +193,7 @@ $categories = mysqli_query($conn, $category_sql);
                                      class="article-image">
                             <?php else: ?>
                                 <div class="article-image d-flex align-items-center justify-content-center bg-light">
-                                    <span style="font-size: 3em;">📄</span>
+                                    <span class="display-1">📄</span>
                                 </div>
                             <?php endif; ?>
 

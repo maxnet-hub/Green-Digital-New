@@ -23,7 +23,6 @@ $result = mysqli_query($conn, $sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จัดการของรางวัล - Green Digital</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/style.css">
     <style>
         .reward-card {
             border: 1px solid #dee2e6;

@@ -46,7 +46,6 @@ if (!$result) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จัดการบทความ - Green Digital</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
     <?php include 'navbar.php'; ?>
@@ -120,9 +119,9 @@ if (!$result) {
                                     <tr>
                                         <td>
                                             <?php if($article['image_url']): ?>
-                                                <img src="<?php echo "../" . $article['image_url']; ?>" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
+                                                <img src="<?php echo "../" . $article['image_url']; ?>" class="img-thumbnail">
                                             <?php else: ?>
-                                                <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">📄</div>
+                                                <div class="bg-secondary text-white d-flex align-items-center justify-content-center">📄</div>
                                             <?php endif; ?>
                                         </td>
                                         <td>
@@ -234,7 +233,7 @@ if (!$result) {
                                                             <label class="form-label">รูปภาพ (ไม่เลือกหากไม่ต้องการเปลี่ยน)</label>
                                                             <?php if($article['image_url']): ?>
                                                                 <div class="mb-2">
-                                                                    <img src="<?php echo "../" .$article['image_url']; ?>" class="img-thumbnail" style="max-height: 150px;">
+                                                                    <img src="<?php echo "../" .$article['image_url']; ?>" class="img-thumbnail">
                                                                 </div>
                                                             <?php endif; ?>
                                                             <input type="file" name="image" class="form-control" accept="image/*">
@@ -247,7 +246,7 @@ if (!$result) {
                                                             </select>
                                                         </div>
 
-                                                        <div id="schedule_fields_edit_<?php echo $article['article_id']; ?>" style="<?php echo $article['status']=='draft' ? 'display:none;' : ''; ?>">
+                                                        <div id="schedule_fields_edit_<?php echo $article['article_id']; ?>" class="<?php echo $article['status']=='draft' ? 'd-none' : ''; ?>">
                                                             <div class="mb-3">
                                                                 <label class="form-label">วันเวลาเริ่มแสดง <span class="text-danger">*</span></label>
                                                                 <input type="datetime-local" name="published_start" class="form-control"
@@ -334,7 +333,7 @@ if (!$result) {
                             </select>
                         </div>
 
-                        <div id="schedule_fields_add_0" style="display:none;">
+                        <div id="schedule_fields_add_0" class="d-none">
                             <div class="mb-3">
                                 <label class="form-label">วันเวลาเริ่มแสดง <span class="text-danger">*</span></label>
                                 <input type="datetime-local" name="published_start" class="form-control" value="<?php echo date('Y-m-d\TH:i'); ?>">
@@ -376,9 +375,9 @@ if (!$result) {
             const scheduleFields = document.getElementById('schedule_fields_' + type + '_' + id);
 
             if (statusSelect.value === 'published') {
-                scheduleFields.style.display = 'block';
+                scheduleFields.classList.remove('d-none');
             } else {
-                scheduleFields.style.display = 'none';
+                scheduleFields.classList.add('d-none');
             }
         }
 
