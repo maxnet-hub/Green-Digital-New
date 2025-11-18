@@ -92,41 +92,6 @@ while ($row = mysqli_fetch_assoc($status_result)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จัดการการจอง - Green Digital Admin</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <style>
-        .booking-card {
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-        }
-        .booking-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
-        .status-badge {
-            font-size: 0.85rem;
-            padding: 5px 12px;
-        }
-        .stat-box {
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            background: #f8f9fa;
-        }
-        .stat-box.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .stat-box h3 {
-            margin: 0;
-            font-size: 1.5rem;
-        }
-        .stat-box p {
-            margin: 5px 0 0 0;
-            font-size: 0.9rem;
-        }
-    </style>
 </head>
 <body>
     <?php include 'navbar.php'; ?>
@@ -162,33 +127,41 @@ while ($row = mysqli_fetch_assoc($status_result)) {
         <div class="row g-3 mb-4">
             <div class="col-md-3">
                 <a href="?status=" class="text-decoration-none">
-                    <div class="stat-box <?php echo !isset($_GET['status']) || $_GET['status'] == '' ? 'active' : ''; ?>">
-                        <h3><?php echo number_format(array_sum($status_counts)); ?></h3>
-                        <p>ทั้งหมด</p>
+                    <div class="card text-center <?php echo !isset($_GET['status']) || $_GET['status'] == '' ? 'bg-primary text-white' : ''; ?>">
+                        <div class="card-body">
+                            <h3 class="mb-0"><?php echo number_format(array_sum($status_counts)); ?></h3>
+                            <p class="mb-0">ทั้งหมด</p>
+                        </div>
                     </div>
                 </a>
             </div>
             <div class="col-md-3">
                 <a href="?status=pending" class="text-decoration-none">
-                    <div class="stat-box <?php echo isset($_GET['status']) && $_GET['status'] == 'pending' ? 'active' : ''; ?>">
-                        <h3><?php echo number_format($status_counts['pending'] ?? 0); ?></h3>
-                        <p>รอดำเนินการ</p>
+                    <div class="card text-center <?php echo isset($_GET['status']) && $_GET['status'] == 'pending' ? 'bg-warning text-dark' : ''; ?>">
+                        <div class="card-body">
+                            <h3 class="mb-0"><?php echo number_format($status_counts['pending'] ?? 0); ?></h3>
+                            <p class="mb-0">รอดำเนินการ</p>
+                        </div>
                     </div>
                 </a>
             </div>
             <div class="col-md-3">
                 <a href="?status=confirmed" class="text-decoration-none">
-                    <div class="stat-box <?php echo isset($_GET['status']) && $_GET['status'] == 'confirmed' ? 'active' : ''; ?>">
-                        <h3><?php echo number_format($status_counts['confirmed'] ?? 0); ?></h3>
-                        <p>ยืนยันแล้ว</p>
+                    <div class="card text-center <?php echo isset($_GET['status']) && $_GET['status'] == 'confirmed' ? 'bg-info text-white' : ''; ?>">
+                        <div class="card-body">
+                            <h3 class="mb-0"><?php echo number_format($status_counts['confirmed'] ?? 0); ?></h3>
+                            <p class="mb-0">ยืนยันแล้ว</p>
+                        </div>
                     </div>
                 </a>
             </div>
             <div class="col-md-3">
                 <a href="?status=completed" class="text-decoration-none">
-                    <div class="stat-box <?php echo isset($_GET['status']) && $_GET['status'] == 'completed' ? 'active' : ''; ?>">
-                        <h3><?php echo number_format($status_counts['completed'] ?? 0); ?></h3>
-                        <p>เสร็จสิ้น</p>
+                    <div class="card text-center <?php echo isset($_GET['status']) && $_GET['status'] == 'completed' ? 'bg-success text-white' : ''; ?>">
+                        <div class="card-body">
+                            <h3 class="mb-0"><?php echo number_format($status_counts['completed'] ?? 0); ?></h3>
+                            <p class="mb-0">เสร็จสิ้น</p>
+                        </div>
                     </div>
                 </a>
             </div>

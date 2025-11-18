@@ -73,65 +73,12 @@ $articles_list = mysqli_query($conn, $articles_sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จัดการความคิดเห็น - Green Digital Admin</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <style>
-        .stats-card {
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            color: white;
-        }
-        .stats-card h3 {
-            font-size: 2rem;
-            font-weight: bold;
-            margin: 0;
-        }
-        .comment-preview {
-            max-width: 300px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .filter-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-    </style>
 </head>
 <body>
     <?php include 'navbar.php'; ?>
 
     <div class="container mt-4 mb-5">
         <h3 class="mb-4">💬 จัดการความคิดเห็นบทความ</h3>
-
-        <!-- สถิติ -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="stats-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                    <p>ทั้งหมด</p>
-                    <h3><?= number_format($stats['total'] ?? 0) ?></h3>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                    <p>กำลังแสดง</p>
-                    <h3><?= number_format($stats['active_count'] ?? 0) ?></h3>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
-                    <p>ถูกลบ</p>
-                    <h3><?= number_format($stats['deleted_count'] ?? 0) ?></h3>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                    <p>ซ่อนโดย Admin</p>
-                    <h3><?= number_format($stats['hidden_count'] ?? 0) ?></h3>
-                </div>
-            </div>
-        </div>
 
         <!-- ฟิลเตอร์ -->
         <div class="filter-section">

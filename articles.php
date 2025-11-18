@@ -45,175 +45,75 @@ $categories = mysqli_query($conn, $category_sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>บทความและความรู้ - Green Digital</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <style>
-        .page-header {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            padding: 60px 0;
-            margin-bottom: 40px;
-        }
-
-        .page-header h1 {
-            font-size: 2.5em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .article-card {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
-            overflow: hidden;
-            margin-bottom: 30px;
-            transition: transform 0.3s;
-        }
-
-        .article-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 25px rgba(0,0,0,0.15);
-        }
-
-        .article-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            background: #f0f0f0;
-        }
-
-        .article-body {
-            padding: 20px;
-        }
-
-        .article-category {
-            display: inline-block;
-            background: #10b981;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            margin-bottom: 10px;
-        }
-
-        .article-title {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .article-excerpt {
-            color: #666;
-            margin-bottom: 15px;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .article-meta {
-            color: #999;
-            font-size: 0.9em;
-            margin-bottom: 15px;
-        }
-
-        .article-meta i {
-            margin-right: 5px;
-        }
-
-        .btn-read-more {
-            background: #10b981;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            transition: background 0.3s;
-        }
-
-        .btn-read-more:hover {
-            background: #059669;
-            color: white;
-        }
-
-        .category-filter {
-            margin-bottom: 30px;
-        }
-
-        .category-btn {
-            margin: 5px;
-        }
-
-        .no-articles {
-            text-align: center;
-            padding: 60px 20px;
-            color: #999;
-        }
-    </style>
 </head>
 <body>
     <?php include 'navbar.php'; ?>
 
     <!-- Page Header -->
-    <section class="page-header">
+    <section class="bg-success bg-gradient text-white py-5 mb-4">
         <div class="container text-center">
-            <h1>📚 บทความและความรู้</h1>
-            <p>เรียนรู้เกี่ยวกับการรีไซเคิล การคัดแยกขยะ และการดูแลสิ่งแวดล้อม</p>
+            <h1 class="display-4 fw-bold mb-3">📚 บทความและความรู้</h1>
+            <p class="fs-5 opacity-75 mb-0">เรียนรู้เกี่ยวกับการรีไซเคิล การคัดแยกขยะ และการดูแลสิ่งแวดล้อม</p>
         </div>
     </section>
 
-    <div class="container">
+    <div class="container mb-5">
         <!-- Category Filter -->
-        <div class="category-filter text-center">
-            <a href="articles.php" class="btn btn-outline-success category-btn <?php echo empty($category_filter) ? 'active' : ''; ?>">
-                ทั้งหมด
-            </a>
-            <?php if($categories && mysqli_num_rows($categories) > 0): ?>
-                <?php while($cat = mysqli_fetch_assoc($categories)): ?>
-                    <a href="articles.php?category=<?php echo urlencode($cat['category']); ?>"
-                       class="btn btn-outline-success category-btn <?php echo $category_filter == $cat['category'] ? 'active' : ''; ?>">
-                        <?php echo htmlspecialchars($cat['category']); ?>
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h5 class="mb-3 fw-bold text-center">🏷️ หมวดหมู่</h5>
+                <div class="text-center">
+                    <a href="articles.php" class="btn btn-outline-success m-1 shadow-sm <?php echo empty($category_filter) ? 'active' : ''; ?>">
+                        ทั้งหมด
                     </a>
-                <?php endwhile; ?>
-            <?php endif; ?>
+                    <?php if($categories && mysqli_num_rows($categories) > 0): ?>
+                        <?php while($cat = mysqli_fetch_assoc($categories)): ?>
+                            <a href="articles.php?category=<?php echo urlencode($cat['category']); ?>"
+                               class="btn btn-outline-success m-1 shadow-sm <?php echo $category_filter == $cat['category'] ? 'active' : ''; ?>">
+                                <?php echo htmlspecialchars($cat['category']); ?>
+                            </a>
+                        <?php endwhile; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
 
         <!-- Articles Grid -->
-        <div class="row">
+        <div class="row g-4">
             <?php if($articles_result && mysqli_num_rows($articles_result) > 0): ?>
                 <?php while($article = mysqli_fetch_assoc($articles_result)): ?>
                     <div class="col-md-6 col-lg-4">
-                        <div class="article-card">
+                        <div class="card border-0 shadow-sm h-100">
                             <?php if(!empty($article['image_url'])): ?>
                                 <img src="<?php echo $article['image_url']; ?>"
                                      alt="<?php echo $article['title']; ?>"
-                                     class="article-image">
+                                     class="card-img-top bg-light"
+                                     style="height: 200px; object-fit: cover;">
                             <?php else: ?>
-                                <div class="article-image d-flex align-items-center justify-content-center bg-light">
+                                <div class="d-flex align-items-center justify-content-center bg-light" style="height: 200px;">
                                     <span class="display-1">📄</span>
                                 </div>
                             <?php endif; ?>
 
-                            <div class="article-body">
+                            <div class="card-body p-4 d-flex flex-column">
                                 <?php if(!empty($article['category'])): ?>
-                                    <span class="article-category"><?php echo htmlspecialchars($article['category']); ?></span>
+                                    <span class="badge bg-success rounded-pill align-self-start mb-2">
+                                        <?php echo htmlspecialchars($article['category']); ?>
+                                    </span>
                                 <?php endif; ?>
 
-                                <h3 class="article-title">
+                                <h3 class="fs-5 fw-bold text-dark mb-2 text-truncate" title="<?php echo htmlspecialchars($article['title']); ?>">
                                     <?php echo htmlspecialchars($article['title']); ?>
                                 </h3>
 
-                                <div class="article-excerpt">
+                                <p class="text-muted mb-3" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">
                                     <?php
                                     $content = strip_tags($article['content']);
                                     echo htmlspecialchars(mb_substr($content, 0, 150)) . '...';
                                     ?>
-                                </div>
+                                </p>
 
-                                <div class="article-meta">
+                                <div class="text-muted small mb-3">
                                     📅 <?php echo date('d/m/Y', strtotime($article['published_at'])); ?>
                                     <?php if(!empty($article['author_name'])): ?>
                                         | ✍️ <?php echo htmlspecialchars($article['author_name']); ?>
@@ -222,7 +122,7 @@ $categories = mysqli_query($conn, $category_sql);
                                 </div>
 
                                 <a href="article_detail.php?id=<?php echo $article['article_id']; ?>"
-                                   class="btn-read-more">
+                                   class="btn btn-success shadow-sm mt-auto">
                                     อ่านต่อ →
                                 </a>
                             </div>
@@ -231,9 +131,12 @@ $categories = mysqli_query($conn, $category_sql);
                 <?php endwhile; ?>
             <?php else: ?>
                 <div class="col-12">
-                    <div class="no-articles">
-                        <h3>📭 ยังไม่มีบทความ</h3>
-                        <p>กำลังเตรียมเนื้อหาที่น่าสนใจให้คุณ</p>
+                    <div class="card border-0 shadow-sm text-center p-5">
+                        <div class="card-body">
+                            <div class="display-1 mb-4">📭</div>
+                            <h3 class="mb-3">ยังไม่มีบทความ</h3>
+                            <p class="text-muted mb-0">กำลังเตรียมเนื้อหาที่น่าสนใจให้คุณ</p>
+                        </div>
                     </div>
                 </div>
             <?php endif; ?>

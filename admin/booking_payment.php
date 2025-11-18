@@ -68,39 +68,6 @@ if ($items->num_rows > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>สรุปการชำระเงิน #<?php echo str_pad($booking_id, 6, '0', STR_PAD_LEFT); ?> - Green Digital Admin</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <style>
-        .summary-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-        }
-        .summary-item:last-child {
-            border-bottom: none;
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-        .detail-card {
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .item-row {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-        }
-    </style>
 </head>
 <body>
     <?php include 'navbar.php'; ?>

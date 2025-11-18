@@ -7,10 +7,8 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-// รับค่าการค้นหา/กรอง
+// รับค่าการค้นหา
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
-$level = isset($_GET['level']) ? $_GET['level'] : '';
-$status_filter = isset($_GET['status']) ? $_GET['status'] : '';
 
 // Query สมาชิก
 $sql = "SELECT * FROM users WHERE 1=1";
@@ -20,32 +18,9 @@ if (!empty($search)) {
     $sql .= " AND (first_name LIKE '%$search_escaped%' OR last_name LIKE '%$search_escaped%' OR email LIKE '%$search_escaped%' OR phone LIKE '%$search_escaped%')";
 }
 
-if (!empty($level)) {
-    $level_escaped = mysqli_real_escape_string($conn, $level);
-    $sql .= " AND user_level = '$level_escaped'";
-}
-
-if (!empty($status_filter)) {
-    $status_escaped = mysqli_real_escape_string($conn, $status_filter);
-    $sql .= " AND status = '$status_escaped'";
-}
-
 $sql .= " ORDER BY created_at DESC";
 
 $result = mysqli_query($conn, $sql);
-
-// Query สถิติ
-$stats_result = mysqli_query($conn, "SELECT COUNT(*) as c FROM users");
-$total_users = mysqli_fetch_assoc($stats_result)['c'];
-
-$stats_result = mysqli_query($conn, "SELECT COUNT(*) as c FROM users WHERE user_level='Bronze'");
-$bronze = mysqli_fetch_assoc($stats_result)['c'];
-
-$stats_result = mysqli_query($conn, "SELECT COUNT(*) as c FROM users WHERE user_level='Silver'");
-$silver = mysqli_fetch_assoc($stats_result)['c'];
-
-$stats_result = mysqli_query($conn, "SELECT COUNT(*) as c FROM users WHERE user_level='Gold'");
-$gold = mysqli_fetch_assoc($stats_result)['c'];
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -89,59 +64,13 @@ $gold = mysqli_fetch_assoc($stats_result)['c'];
             </div>
         <?php endif; ?>
 
-        <!-- สถิติสมาชิก -->
-        <h4 class="mb-3">📊 สถิติสมาชิก</h4>
-        <div class="row g-3 mb-4">
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <h6>สมาชิกทั้งหมด</h6>
-                    <div class="stat-number"><?php echo number_format($total_users); ?></div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <h6>🥉 Bronze</h6>
-                    <div class="stat-number text-warning"><?php echo number_format($bronze); ?></div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <h6>🥈 Silver</h6>
-                    <div class="stat-number text-secondary"><?php echo number_format($silver); ?></div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <h6>🥇 Gold</h6>
-                    <div class="stat-number" style="color: #ffd700;"><?php echo number_format($gold); ?></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ฟอร์มค้นหา/กรอง -->
+        <!-- ฟอร์มค้นหา -->
         <div class="card mb-4">
             <div class="card-body">
                 <form method="GET" class="row g-3">
-                    <div class="col-md-4">
+                    <div class="col-md-10">
                         <label class="form-label">ค้นหา</label>
-                        <input type="text" name="search" class="form-control" placeholder="ชื่อ, Email, เบอร์โทร" value="<?php echo htmlspecialchars($search); ?>">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">ระดับสมาชิก</label>
-                        <select name="level" class="form-select">
-                            <option value="">ทุกระดับ</option>
-                            <option value="Bronze" <?php echo $level == 'Bronze' ? 'selected' : ''; ?>>Bronze</option>
-                            <option value="Silver" <?php echo $level == 'Silver' ? 'selected' : ''; ?>>Silver</option>
-                            <option value="Gold" <?php echo $level == 'Gold' ? 'selected' : ''; ?>>Gold</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">สถานะ</label>
-                        <select name="status" class="form-select">
-                            <option value="">ทุกสถานะ</option>
-                            <option value="active" <?php echo $status_filter == 'active' ? 'selected' : ''; ?>>ใช้งานได้</option>
-                            <option value="suspended" <?php echo $status_filter == 'suspended' ? 'selected' : ''; ?>>ระงับการใช้งาน</option>
-                        </select>
+                        <input type="text" name="search" class="form-control" placeholder="ค้นหาจาก ชื่อ, นามสกุล, Email, เบอร์โทร" value="<?php echo htmlspecialchars($search); ?>">
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary w-100">🔍 ค้นหา</button>

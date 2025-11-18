@@ -33,90 +33,47 @@ $rewards = mysqli_query($conn, $rewards_sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ของรางวัล - Green Digital</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <style>
-        .points-hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        .reward-card {
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            overflow: hidden;
-            transition: all 0.3s;
-            height: 100%;
-        }
-        .reward-card:hover {
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            transform: translateY(-5px);
-        }
-        .reward-image {
-            height: 200px;
-            background: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4em;
-        }
-        .points-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-        .stock-badge {
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.85em;
-        }
-        .info-alert {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-    </style>
 </head>
 <body>
     <?php include 'navbar.php'; ?>
 
     <div class="container mt-4 mb-5">
         <!-- Points Hero -->
-        <div class="points-hero">
-            <h4>แต้มสะสมของคุณ</h4>
-            <h1 class="display-4 mb-0"><?= number_format($current_points) ?> แต้ม</h1>
-            <p class="mb-3">ดูรายการของรางวัลที่สามารถแลกได้</p>
-            <a href="my_redemptions.php" class="btn btn-light btn-lg">
-                📋 ดูประวัติการแลกของฉัน
-            </a>
+        <div class="card border-0 shadow-lg mb-4 bg-primary bg-gradient text-white">
+            <div class="card-body text-center p-5">
+                <h4 class="mb-3 opacity-75">⭐ แต้มสะสมของคุณ</h4>
+                <h1 class="display-1 fw-bold mb-3"><?= number_format($current_points) ?></h1>
+                <h4 class="mb-4 opacity-75">แต้ม</h4>
+                <p class="mb-4 fs-5">ดูรายการของรางวัลที่สามารถแลกได้</p>
+                <a href="my_redemptions.php" class="btn btn-light btn-lg shadow">
+                    📋 ดูประวัติการแลกของฉัน
+                </a>
+            </div>
         </div>
 
         <!-- Info Alert -->
-        <div class="alert info-alert">
-            <h5 class="mb-2">💬 วิธีการแลกของรางวัล</h5>
-            <p class="mb-0">
-                กรุณาติดต่อเจ้าหน้าที่เพื่อแลกของรางวัล โดยแจ้งชื่อและเบอร์โทรศัพท์ของคุณ<br>
-                เจ้าหน้าที่จะช่วยตรวจสอบแต้มและดำเนินการแลกของให้คุณ
-            </p>
+        <div class="card border-0 shadow-sm mb-4 border-start border-danger border-5 bg-light">
+            <div class="card-body p-4">
+                <h5 class="mb-3 text-danger">💬 วิธีการแลกของรางวัล</h5>
+                <p class="mb-0 text-dark">
+                    กรุณาติดต่อเจ้าหน้าที่เพื่อแลกของรางวัล โดยแจ้งชื่อและเบอร์โทรศัพท์ของคุณ<br>
+                    เจ้าหน้าที่จะช่วยตรวจสอบแต้มและดำเนินการแลกของให้คุณ
+                </p>
+            </div>
         </div>
 
         <!-- Category Filter -->
-        <div class="mb-4">
-            <div class="btn-group" role="group">
-                <a href="rewards.php?category=all" class="btn <?= $category_filter == 'all' ? 'btn-primary' : 'btn-outline-primary' ?>">ทั้งหมด</a>
-                <a href="rewards.php?category=food" class="btn <?= $category_filter == 'food' ? 'btn-primary' : 'btn-outline-primary' ?>">อาหาร</a>
-                <a href="rewards.php?category=product" class="btn <?= $category_filter == 'product' ? 'btn-primary' : 'btn-outline-primary' ?>">สินค้า</a>
-                <a href="rewards.php?category=voucher" class="btn <?= $category_filter == 'voucher' ? 'btn-primary' : 'btn-outline-primary' ?>">คูปอง</a>
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between flex-wrap">
+                    <h6 class="mb-0 me-3">🔍 กรองตามหมวดหมู่:</h6>
+                    <div class="btn-group shadow-sm" role="group">
+                        <a href="rewards.php?category=all" class="btn <?= $category_filter == 'all' ? 'btn-primary' : 'btn-outline-primary' ?>">ทั้งหมด</a>
+                        <a href="rewards.php?category=food" class="btn <?= $category_filter == 'food' ? 'btn-primary' : 'btn-outline-primary' ?>">🍱 อาหาร</a>
+                        <a href="rewards.php?category=product" class="btn <?= $category_filter == 'product' ? 'btn-primary' : 'btn-outline-primary' ?>">🎁 สินค้า</a>
+                        <a href="rewards.php?category=voucher" class="btn <?= $category_filter == 'voucher' ? 'btn-primary' : 'btn-outline-primary' ?>">🎟️ คูปอง</a>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -135,47 +92,56 @@ $rewards = mysqli_query($conn, $rewards_sql);
                     ];
                     ?>
                     <div class="col-md-4 mb-4">
-                        <div class="reward-card">
+                        <div class="card border-0 shadow-sm h-100">
                             <div class="position-relative">
-                                <div class="reward-image">
-                                    <?= $category_icon[$reward['category']] ?? '🎁' ?>
+                                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <span style="font-size: 5rem;"><?= $category_icon[$reward['category']] ?? '🎁' ?></span>
                                 </div>
-                                <span class="points-badge"><?= number_format($reward['points_required']) ?> แต้ม</span>
+                                <span class="position-absolute top-0 end-0 m-3 badge bg-primary bg-gradient shadow fs-6 px-3 py-2">
+                                    <?= number_format($reward['points_required']) ?> แต้ม
+                                </span>
                             </div>
-                            <div class="card-body">
-                                <h5 class="card-title"><?= htmlspecialchars($reward['reward_name']) ?></h5>
-                                <p class="card-text text-muted"><?= htmlspecialchars($reward['description']) ?></p>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-bold mb-2"><?= htmlspecialchars($reward['reward_name']) ?></h5>
+                                <p class="card-text text-muted mb-3 flex-grow-1"><?= htmlspecialchars($reward['description']) ?></p>
 
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span>
+                                <div class="d-flex justify-content-between align-items-center mb-3 gap-2">
+                                    <div>
                                         <?php if($reward['stock_quantity'] == 0): ?>
-                                            <span class="badge bg-success">มีให้บริการ</span>
+                                            <span class="badge bg-success fs-6 px-3 py-2">✅ มีให้บริการ</span>
                                         <?php elseif($reward['stock_quantity'] > 0): ?>
-                                            <span class="badge bg-success">เหลือ <?= $reward['stock_quantity'] ?></span>
+                                            <span class="badge bg-success fs-6 px-3 py-2">📦 เหลือ <?= $reward['stock_quantity'] ?></span>
                                         <?php else: ?>
-                                            <span class="badge bg-danger">หมดแล้ว</span>
+                                            <span class="badge bg-danger fs-6 px-3 py-2">❌ หมดแล้ว</span>
                                         <?php endif; ?>
-                                    </span>
-                                    <span>
+                                    </div>
+                                    <div>
                                         <?php if($can_afford): ?>
-                                            <span class="badge bg-primary">แต้มพอ</span>
+                                            <span class="badge bg-info fs-6 px-3 py-2">💰 แต้มพอ</span>
                                         <?php else: ?>
-                                            <span class="badge bg-secondary">แต้มไม่พอ</span>
+                                            <span class="badge bg-secondary fs-6 px-3 py-2">⚠️ แต้มไม่พอ</span>
                                         <?php endif; ?>
-                                    </span>
+                                    </div>
                                 </div>
 
-                                <div class="alert alert-info py-2 mb-0">
-                                    <small>💬 ติดต่อเจ้าหน้าที่เพื่อแลก</small>
+                                <div class="card bg-light border-0">
+                                    <div class="card-body text-center py-2">
+                                        <small class="text-muted fw-bold">💬 ติดต่อเจ้าหน้าที่เพื่อแลก</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 <?php endwhile; ?>
             <?php else: ?>
-                <div class="col-12 text-center py-5">
-                    <h3 class="text-muted">🎁</h3>
-                    <p class="text-muted">ยังไม่มีของรางวัลในหมวดหมู่นี้</p>
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm text-center p-5">
+                        <div class="card-body">
+                            <div class="display-1 mb-4">🎁</div>
+                            <h4 class="mb-3">ยังไม่มีของรางวัลในหมวดหมู่นี้</h4>
+                            <p class="text-muted">ลองเลือกหมวดหมู่อื่นเพื่อดูของรางวัลที่มีให้แลก</p>
+                        </div>
+                    </div>
                 </div>
             <?php endif; ?>
         </div>

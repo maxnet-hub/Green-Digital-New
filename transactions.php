@@ -31,56 +31,16 @@ $transactions = mysqli_query($conn, $transactions_sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ประวัติธุรกรรม - Green Digital</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <style>
-        .transaction-card {
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-        }
-        .transaction-card:hover {
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
-        .amount-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-        }
-        .stats-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            border: 1px solid #dee2e6;
-            margin-bottom: 20px;
-        }
-        .stat-item {
-            text-align: center;
-            padding: 15px;
-        }
-        .stat-value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #667eea;
-        }
-        .stat-label {
-            color: #6c757d;
-            font-size: 0.9em;
-        }
-    </style>
 </head>
 <body>
     <?php include 'navbar.php'; ?>
 
     <div class="container mt-4 mb-5">
         <!-- Header -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <h2>💳 ประวัติธุรกรรม</h2>
-                <p class="text-muted">รายการชำระเงินทั้งหมดของคุณ</p>
+        <div class="card border-0 shadow mb-4 bg-primary bg-gradient text-white">
+            <div class="card-body p-4">
+                <h2 class="mb-2 fw-bold">💳 ประวัติธุรกรรม</h2>
+                <p class="mb-0 opacity-75">รายการชำระเงินทั้งหมดของคุณ</p>
             </div>
         </div>
 
@@ -101,24 +61,38 @@ $transactions = mysqli_query($conn, $transactions_sql);
         mysqli_data_seek($transactions, 0);
         ?>
 
-        <div class="stats-card">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="stat-item">
-                        <div class="stat-value"><?php echo number_format($total_transactions); ?></div>
-                        <div class="stat-label">ธุรกรรมทั้งหมด</div>
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h5 class="mb-4 fw-bold">
+                    <span class="text-primary">📊</span> สรุปสถิติธุรกรรม
+                </h5>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="text-center p-3 bg-light rounded-3">
+                            <div class="mb-2">
+                                <span class="fs-2">📝</span>
+                            </div>
+                            <h2 class="display-6 fw-bold text-primary mb-2"><?php echo number_format($total_transactions); ?></h2>
+                            <p class="text-muted mb-0 fw-bold">ธุรกรรมทั้งหมด</p>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="stat-item">
-                        <div class="stat-value text-success"><?php echo number_format($total_income, 2); ?> ฿</div>
-                        <div class="stat-label">รายได้รวม</div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3 bg-light rounded-3">
+                            <div class="mb-2">
+                                <span class="fs-2">💰</span>
+                            </div>
+                            <h2 class="display-6 fw-bold text-success mb-2"><?php echo number_format($total_income, 2); ?> ฿</h2>
+                            <p class="text-muted mb-0 fw-bold">รายได้รวม</p>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="stat-item">
-                        <div class="stat-value text-info"><?php echo number_format($total_weight_all, 2); ?> kg</div>
-                        <div class="stat-label">น้ำหนักรวม</div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3 bg-light rounded-3">
+                            <div class="mb-2">
+                                <span class="fs-2">⚖️</span>
+                            </div>
+                            <h2 class="display-6 fw-bold text-info mb-2"><?php echo number_format($total_weight_all, 2); ?> kg</h2>
+                            <p class="text-muted mb-0 fw-bold">น้ำหนักรวม</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -129,83 +103,91 @@ $transactions = mysqli_query($conn, $transactions_sql);
             <div class="col-12">
                 <?php if (mysqli_num_rows($transactions) > 0): ?>
                     <?php while ($trans = mysqli_fetch_assoc($transactions)): ?>
-                        <div class="transaction-card">
-                            <div class="row align-items-center">
-                                <!-- Left: Transaction Info -->
-                                <div class="col-md-8">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div>
-                                            <h5 class="mb-1">
-                                                การจอง #<?php echo str_pad($trans['booking_id'], 6, '0', STR_PAD_LEFT); ?>
-                                            </h5>
-                                            <small class="text-muted">
-                                                ธุรกรรม #<?php echo $trans['transaction_id']; ?> •
-                                                <?php echo date('d/m/Y H:i น.', strtotime($trans['created_at'])); ?>
-                                            </small>
+                        <div class="card border-0 shadow-sm mb-3">
+                            <div class="card-body p-4">
+                                <div class="row align-items-center">
+                                    <!-- Left: Transaction Info -->
+                                    <div class="col-md-8">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <div>
+                                                <h5 class="mb-1 fw-bold">
+                                                    การจอง #<?php echo str_pad($trans['booking_id'], 6, '0', STR_PAD_LEFT); ?>
+                                                </h5>
+                                                <small class="text-muted">
+                                                    ธุรกรรม #<?php echo $trans['transaction_id']; ?> •
+                                                    <?php echo date('d/m/Y H:i น.', strtotime($trans['created_at'])); ?>
+                                                </small>
+                                            </div>
+                                            <div>
+                                                <?php if ($trans['payment_status'] == 'paid'): ?>
+                                                    <span class="badge bg-success fs-6 px-3 py-2">ชำระแล้ว</span>
+                                                <?php elseif ($trans['payment_status'] == 'pending'): ?>
+                                                    <span class="badge bg-warning fs-6 px-3 py-2">รอชำระ</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-danger fs-6 px-3 py-2">ล้มเหลว</span>
+                                                <?php endif; ?>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <?php if ($trans['payment_status'] == 'paid'): ?>
-                                                <span class="badge bg-success">ชำระแล้ว</span>
-                                            <?php elseif ($trans['payment_status'] == 'pending'): ?>
-                                                <span class="badge bg-warning">รอชำระ</span>
-                                            <?php else: ?>
-                                                <span class="badge bg-danger">ล้มเหลว</span>
-                                            <?php endif; ?>
+
+                                        <div class="row mt-3">
+                                            <div class="col-md-6 mb-2">
+                                                <small class="text-muted d-block mb-1">วิธีการชำระเงิน</small>
+                                                <span class="fw-bold">
+                                                <?php
+                                                $payment_methods = [
+                                                    'cash' => '💵 เงินสด',
+                                                    'bank_transfer' => '🏦 โอนเงิน',
+                                                    'promptpay' => '📱 พร้อมเพย์'
+                                                ];
+                                                echo $payment_methods[$trans['payment_method']] ?? $trans['payment_method'];
+                                                ?>
+                                                </span>
+                                            </div>
+                                            <div class="col-md-6 mb-2">
+                                                <small class="text-muted d-block mb-1">น้ำหนักทั้งหมด</small>
+                                                <span class="fw-bold"><?php echo number_format($trans['total_weight'], 2); ?> kg</span>
+                                            </div>
                                         </div>
+
+                                        <?php if ($trans['payment_date']): ?>
+                                            <div class="mt-2">
+                                                <small class="text-muted">
+                                                    วันที่ชำระ: <?php echo date('d/m/Y H:i น.', strtotime($trans['payment_date'])); ?>
+                                                </small>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
 
-                                    <div class="row mt-3">
-                                        <div class="col-md-6">
-                                            <small class="text-muted">วิธีการชำระเงิน</small><br>
-                                            <?php
-                                            $payment_methods = [
-                                                'cash' => '💵 เงินสด',
-                                                'bank_transfer' => '🏦 โอนเงิน',
-                                                'promptpay' => '📱 พร้อมเพย์'
-                                            ];
-                                            echo $payment_methods[$trans['payment_method']] ?? $trans['payment_method'];
-                                            ?>
+                                    <!-- Right: Amount & Action -->
+                                    <div class="col-md-4">
+                                        <div class="card bg-success bg-gradient text-white border-0 shadow mb-3">
+                                            <div class="card-body text-center p-3">
+                                                <div class="opacity-75 mb-2">ยอดเงิน</div>
+                                                <h2 class="fw-bold mb-0">
+                                                    <?php echo number_format($trans['total_amount'], 2); ?> ฿
+                                                </h2>
+                                            </div>
                                         </div>
-                                        <div class="col-md-6">
-                                            <small class="text-muted">น้ำหนักทั้งหมด</small><br>
-                                            <strong><?php echo number_format($trans['total_weight'], 2); ?> kg</strong>
-                                        </div>
+                                        <a href="booking_detail.php?id=<?php echo $trans['booking_id']; ?>"
+                                           class="btn btn-outline-primary w-100 shadow-sm">
+                                            ดูรายละเอียด
+                                        </a>
                                     </div>
-
-                                    <?php if ($trans['payment_date']): ?>
-                                        <div class="mt-2">
-                                            <small class="text-muted">
-                                                วันที่ชำระ: <?php echo date('d/m/Y H:i น.', strtotime($trans['payment_date'])); ?>
-                                            </small>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-
-                                <!-- Right: Amount & Action -->
-                                <div class="col-md-4">
-                                    <div class="amount-box mb-3">
-                                        <div class="fs-6 opacity-75">ยอดเงิน</div>
-                                        <div class="fs-1 fw-bold">
-                                            <?php echo number_format($trans['total_amount'], 2); ?> ฿
-                                        </div>
-                                    </div>
-                                    <a href="booking_detail.php?id=<?php echo $trans['booking_id']; ?>"
-                                       class="btn btn-outline-primary w-100">
-                                        ดูรายละเอียด
-                                    </a>
                                 </div>
                             </div>
                         </div>
                     <?php endwhile; ?>
                 <?php else: ?>
                     <!-- Empty State -->
-                    <div class="text-center py-5">
-                        <div class="display-1 opacity-25">💳</div>
-                        <h4 class="text-muted mt-3">ยังไม่มีธุรกรรม</h4>
-                        <p class="text-muted">เมื่อคุณทำการขายขยะรีไซเคิลกับเรา<br>ประวัติธุรกรรมจะแสดงที่นี่</p>
-                        <a href="booking_create.php" class="btn btn-primary mt-3">
-                            📝 จองรับซื้อขยะ
-                        </a>
+                    <div class="card border-0 shadow-sm text-center p-5">
+                        <div class="card-body">
+                            <div class="display-1 mb-4">💳</div>
+                            <h4 class="mb-3">ยังไม่มีธุรกรรม</h4>
+                            <p class="text-muted mb-4">เมื่อคุณทำการขายขยะรีไซเคิลกับเรา<br>ประวัติธุรกรรมจะแสดงที่นี่</p>
+                            <a href="booking_create.php" class="btn btn-primary btn-lg shadow">
+                                📝 จองรับซื้อขยะ
+                            </a>
+                        </div>
                     </div>
                 <?php endif; ?>
             </div>

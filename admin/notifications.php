@@ -18,15 +18,7 @@ $result = mysqli_query($conn,$sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>การแจ้งเตือน - Green Digital Admin</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <style>
-        .notification-card {
-            border-left: 4px solid #6c757d;
-        }
-        .notification-card.type-booking { border-left-color: #0d6efd; }
-        .notification-card.type-payment { border-left-color: #198754; }
-        .notification-card.type-system { border-left-color: #6c757d; }
-        .notification-card.type-promotion { border-left-color: #ffc107; }
-    </style>
+
 </head>
 <body>
     <?php include 'navbar.php'; ?>
@@ -49,25 +41,21 @@ $result = mysqli_query($conn,$sql);
 
                         switch($notif['type']) {
                             case 'booking':
-                                $icon = '🔵';
                                 $type_class = 'type-booking';
                                 $type_name = 'การจอง';
                                 $badge_class = 'bg-primary';
                                 break;
                             case 'payment':
-                                $icon = '💚';
                                 $type_class = 'type-payment';
                                 $type_name = 'การชำระเงิน';
                                 $badge_class = 'bg-success';
                                 break;
                             case 'system':
-                                $icon = '⚙️';
                                 $type_class = 'type-system';
                                 $type_name = 'ระบบ';
                                 $badge_class = 'bg-secondary';
                                 break;
                             case 'promotion':
-                                $icon = '🎁';
                                 $type_class = 'type-promotion';
                                 $type_name = 'โปรโมชั่น';
                                 $badge_class = 'bg-warning text-dark';
@@ -78,7 +66,7 @@ $result = mysqli_query($conn,$sql);
                         <div class="card-body">
                             <div class="d-flex">
                                 <div class="me-3 fs-1">
-                                    <?php echo $icon; ?>
+                                    
                                 </div>
                                 <div class="flex-grow-1">
                                     <div class="d-flex justify-content-between align-items-start mb-2">

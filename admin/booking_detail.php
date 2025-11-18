@@ -79,50 +79,6 @@ $recycle_types = mysqli_query($conn, "SELECT rt.type_id, rt.type_name, rt.catego
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>รายละเอียดการจอง #<?php echo str_pad($booking_id, 6, '0', STR_PAD_LEFT); ?> - Green Digital Admin</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <style>
-        .detail-card {
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .item-detail {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-        }
-        .status-timeline {
-            position: relative;
-            padding-left: 30px;
-        }
-        .status-timeline::before {
-            content: '';
-            position: absolute;
-            left: 10px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: #dee2e6;
-        }
-        .timeline-item {
-            position: relative;
-            padding-bottom: 20px;
-        }
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -24px;
-            top: 5px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #6c757d;
-        }
-        .timeline-item.active::before {
-            background: #28a745;
-        }
-    </style>
 </head>
 <body>
     <?php include 'navbar.php'; ?>
@@ -501,29 +457,6 @@ $recycle_types = mysqli_query($conn, "SELECT rt.type_id, rt.type_name, rt.catego
                         </div>
                         <p class="text-muted small mb-0">* พนักงานไม่สามารถแก้ไขได้</p>
                     <?php endif; ?>
-                </div>
-
-                <!-- Timeline -->
-                <div class="detail-card">
-                    <h5 class="mb-3">📊 Timeline</h5>
-                    <div class="status-timeline">
-                        <div class="timeline-item active">
-                            <strong>สร้างการจอง</strong><br>
-                            <small class="text-muted"><?php echo date('d/m/Y H:i', strtotime($booking['created_at'])); ?></small>
-                        </div>
-                        <div class="timeline-item <?php echo in_array($booking['status'], ['confirmed', 'completed']) ? 'active' : ''; ?>">
-                            <strong>ยืนยันแล้ว</strong><br>
-                            <small class="text-muted">
-                                <?php echo ($booking['status'] == 'confirmed' || $booking['status'] == 'completed') ? date('d/m/Y H:i', strtotime($booking['updated_at'])) : '-'; ?>
-                            </small>
-                        </div>
-                        <div class="timeline-item <?php echo $booking['status'] == 'completed' ? 'active' : ''; ?>">
-                            <strong>เสร็จสิ้น</strong><br>
-                            <small class="text-muted">
-                                <?php echo $booking['status'] == 'completed' ? date('d/m/Y H:i', strtotime($booking['updated_at'])) : '-'; ?>
-                            </small>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

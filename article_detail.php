@@ -90,201 +90,22 @@ $related_articles = mysqli_query($conn, $related_sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($article['title']); ?> - Green Digital</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <style>
-        .article-header {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            padding: 40px 0;
-            margin-bottom: 40px;
-        }
-
-        .article-category {
-            display: inline-block;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            margin-bottom: 15px;
-        }
-
-        .article-title {
-            font-size: 2.5em;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .article-meta {
-            font-size: 1em;
-            opacity: 0.9;
-        }
-
-        .article-image {
-            width: 100%;
-            max-height: 500px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-
-        .article-content {
-            font-size: 1.1em;
-            line-height: 1.8;
-            color: #333;
-            margin-bottom: 40px;
-        }
-
-        .article-content p {
-            margin-bottom: 20px;
-        }
-
-        .related-articles {
-            background: #f8f9fa;
-            padding: 40px 0;
-            margin-top: 60px;
-        }
-
-        .related-card {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-            margin-bottom: 20px;
-        }
-
-        .related-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .related-image {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            background: #f0f0f0;
-        }
-
-        .related-body {
-            padding: 15px;
-        }
-
-        .related-title {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .back-button {
-            margin-bottom: 20px;
-        }
-
-        /* Comments Section */
-        .comments-section {
-            background: #f8f9fa;
-            padding: 40px 0;
-            margin-top: 40px;
-        }
-
-        .comments-header {
-            font-size: 1.8em;
-            font-weight: bold;
-            margin-bottom: 30px;
-            color: #333;
-        }
-
-        .comment-box {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .comment-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .comment-author {
-            font-weight: bold;
-            color: #10b981;
-            font-size: 1.1em;
-        }
-
-        .comment-date {
-            color: #6b7280;
-            font-size: 0.9em;
-        }
-
-        .comment-text {
-            color: #333;
-            line-height: 1.6;
-            margin-bottom: 15px;
-            word-wrap: break-word;
-        }
-
-        .comment-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .comment-actions .btn {
-            font-size: 0.85em;
-            padding: 5px 15px;
-        }
-
-        .reply-box {
-            margin-left: 40px;
-            margin-top: 15px;
-            border-left: 3px solid #10b981;
-            padding-left: 15px;
-        }
-
-        .comment-form {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            margin-top: 30px;
-        }
-
-        .comment-form textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
-
-        .edit-indicator {
-            font-size: 0.85em;
-            color: #6b7280;
-            font-style: italic;
-        }
-
-        .reply-form {
-            margin-top: 15px;
-            padding: 15px;
-            background: #f9fafb;
-            border-radius: 8px;
-        }
-    </style>
 </head>
 <body>
     <?php include 'navbar.php'; ?>
 
     <!-- Article Header -->
-    <section class="article-header">
+    <section class="bg-success bg-gradient text-white py-5 mb-4">
         <div class="container">
             <?php if(!empty($article['category'])): ?>
-                <span class="article-category"><?php echo htmlspecialchars($article['category']); ?></span>
+                <span class="badge bg-white bg-opacity-25 text-white rounded-pill px-3 py-2 mb-3">
+                    <?php echo htmlspecialchars($article['category']); ?>
+                </span>
             <?php endif; ?>
 
-            <h1 class="article-title"><?php echo htmlspecialchars($article['title']); ?></h1>
+            <h1 class="display-3 fw-bold mb-3"><?php echo htmlspecialchars($article['title']); ?></h1>
 
-            <div class="article-meta">
+            <div class="fs-5 opacity-75">
                 📅 <?php echo date('d F Y', strtotime($article['published_at'])); ?>
                 <?php if(!empty($article['author_name'])): ?>
                     | ✍️ <?php echo htmlspecialchars($article['author_name']); ?>
@@ -295,9 +116,9 @@ $related_articles = mysqli_query($conn, $related_sql);
     </section>
 
     <!-- Article Content -->
-    <div class="container">
-        <div class="back-button">
-            <a href="articles.php" class="btn btn-outline-success">← กลับไปหน้าบทความ</a>
+    <div class="container mb-5">
+        <div class="mb-3">
+            <a href="articles.php" class="btn btn-outline-success shadow-sm">← กลับไปหน้าบทความ</a>
         </div>
 
         <div class="row">
@@ -305,28 +126,29 @@ $related_articles = mysqli_query($conn, $related_sql);
                 <?php if(!empty($article['image_url'])): ?>
                     <img src="<?php echo htmlspecialchars(ltrim($article['image_url'], '/')); ?>"
                          alt="<?php echo htmlspecialchars($article['title']); ?>"
-                         class="article-image">
+                         class="img-fluid rounded shadow-sm mb-4"
+                         style="max-height: 500px; width: 100%; object-fit: cover;">
                 <?php endif; ?>
 
-                <div class="article-content">
+                <div class="fs-5 lh-lg text-dark mb-4">
                     <?php echo nl2br(htmlspecialchars($article['content'])); ?>
                 </div>
 
-                <hr>
+                <hr class="my-4">
 
                 <div class="text-center my-4">
-                    <a href="articles.php" class="btn btn-success">อ่านบทความอื่นๆ</a>
+                    <a href="articles.php" class="btn btn-success shadow-sm">อ่านบทความอื่นๆ</a>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Comments Section -->
-    <section class="comments-section" id="comments">
+    <section class="bg-light py-5" id="comments">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 mx-auto">
-                    <h3 class="comments-header">💬 ความคิดเห็น (<?php echo $comment_count; ?>)</h3>
+                    <h3 class="display-6 fw-bold mb-4 text-dark">💬 ความคิดเห็น (<?php echo $comment_count; ?>)</h3>
 
                     <?php if(isset($_GET['comment_success'])): ?>
                         <div class="alert alert-success alert-dismissible fade show">
@@ -367,39 +189,40 @@ $related_articles = mysqli_query($conn, $related_sql);
                     <!-- แสดงคอมเมนต์ทั้งหมด -->
                     <?php if(count($comments) > 0): ?>
                         <?php foreach($comments as $comment): ?>
-                            <div class="comment-box" id="comment-<?php echo $comment['comment_id']; ?>">
-                                <div class="comment-header">
-                                    <div>
-                                        <span class="comment-author">
-                                            <?php if($comment['admin_id']): ?>
-                                                👨‍💼 <?php echo htmlspecialchars($comment['admin_name']); ?> <span class="badge bg-primary">Admin</span>
-                                            <?php else: ?>
-                                                👤 <?php echo htmlspecialchars($comment['user_first_name'] . ' ' . $comment['user_last_name']); ?>
+                            <div class="card border-0 shadow-sm mb-3" id="comment-<?php echo $comment['comment_id']; ?>">
+                                <div class="card-body p-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <span class="fw-bold text-success fs-6">
+                                                <?php if($comment['admin_id']): ?>
+                                                    👨‍💼 <?php echo htmlspecialchars($comment['admin_name']); ?> <span class="badge bg-primary">Admin</span>
+                                                <?php else: ?>
+                                                    👤 <?php echo htmlspecialchars($comment['user_first_name'] . ' ' . $comment['user_last_name']); ?>
+                                                <?php endif; ?>
+                                            </span>
+                                            <span class="text-muted small">
+                                                | <?php
+                                                    $time_ago = time() - strtotime($comment['created_at']);
+                                                    if ($time_ago < 60) echo 'เมื่อสักครู่';
+                                                    elseif ($time_ago < 3600) echo floor($time_ago / 60) . ' นาทีที่แล้ว';
+                                                    elseif ($time_ago < 86400) echo floor($time_ago / 3600) . ' ชั่วโมงที่แล้ว';
+                                                    else echo floor($time_ago / 86400) . ' วันที่แล้ว';
+                                                ?>
+                                            </span>
+                                            <?php if($comment['updated_at']): ?>
+                                                <span class="text-muted small fst-italic">(แก้ไขแล้ว)</span>
                                             <?php endif; ?>
-                                        </span>
-                                        <span class="comment-date">
-                                            | <?php
-                                                $time_ago = time() - strtotime($comment['created_at']);
-                                                if ($time_ago < 60) echo 'เมื่อสักครู่';
-                                                elseif ($time_ago < 3600) echo floor($time_ago / 60) . ' นาทีที่แล้ว';
-                                                elseif ($time_ago < 86400) echo floor($time_ago / 3600) . ' ชั่วโมงที่แล้ว';
-                                                else echo floor($time_ago / 86400) . ' วันที่แล้ว';
-                                            ?>
-                                        </span>
-                                        <?php if($comment['updated_at']): ?>
-                                            <span class="edit-indicator">(แก้ไขแล้ว)</span>
-                                        <?php endif; ?>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="comment-text">
-                                    <?php echo nl2br(htmlspecialchars($comment['comment_text'])); ?>
-                                </div>
+                                    <div class="text-dark lh-base mb-3">
+                                        <?php echo nl2br(htmlspecialchars($comment['comment_text'])); ?>
+                                    </div>
 
-                                <div class="comment-actions">
-                                    <button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(<?php echo $comment['comment_id']; ?>)">
-                                        💬 ตอบกลับ
-                                    </button>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="toggleReplyForm(<?php echo $comment['comment_id']; ?>)">
+                                            💬 ตอบกลับ
+                                        </button>
 
                                     <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $comment['user_id']): ?>
                                         <?php
@@ -416,101 +239,102 @@ $related_articles = mysqli_query($conn, $related_sql);
                                             <button type="submit" class="btn btn-sm btn-outline-danger">🗑️ ลบ</button>
                                         </form>
                                     <?php endif; ?>
-                                </div>
-
-                                <!-- ฟอร์มแก้ไข (ซ่อนไว้) -->
-                                <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $comment['user_id'] && $can_edit): ?>
-                                    <div class="reply-form d-none" id="edit-form-<?php echo $comment['comment_id']; ?>">
-                                        <form method="POST" action="sql/comment_edit.php">
-                                            <input type="hidden" name="comment_id" value="<?php echo $comment['comment_id']; ?>">
-                                            <textarea name="comment_text" class="form-control mb-2" rows="3" required><?php echo htmlspecialchars($comment['comment_text']); ?></textarea>
-                                            <button type="submit" class="btn btn-sm btn-warning">💾 บันทึก</button>
-                                            <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEditForm(<?php echo $comment['comment_id']; ?>)">ยกเลิก</button>
-                                            <small class="text-muted d-block mt-1">แก้ไขได้ภายใน 15 นาทีหลังโพสต์</small>
-                                        </form>
                                     </div>
-                                <?php endif; ?>
 
-                                <!-- ฟอร์มตอบกลับ (ซ่อนไว้) -->
-                                <div class="reply-form d-none" id="reply-form-<?php echo $comment['comment_id']; ?>">
-                                    <?php if(isset($_SESSION['user_id']) || isset($_SESSION['admin_id'])): ?>
-                                        <form method="POST" action="sql/comment_add.php">
-                                            <input type="hidden" name="article_id" value="<?php echo $article_id; ?>">
-                                            <input type="hidden" name="parent_comment_id" value="<?php echo $comment['comment_id']; ?>">
-                                            <textarea name="comment_text" class="form-control mb-2" placeholder="เขียนตอบกลับ..." rows="3" required></textarea>
-                                            <button type="submit" class="btn btn-sm btn-primary">ส่งตอบกลับ</button>
-                                            <button type="button" class="btn btn-sm btn-secondary" onclick="toggleReplyForm(<?php echo $comment['comment_id']; ?>)">ยกเลิก</button>
-                                        </form>
-                                    <?php else: ?>
-                                        <div class="alert alert-info mb-0">
-                                            กรุณา <a href="user_login.php">เข้าสู่ระบบ</a> เพื่อตอบกลับความคิดเห็น
+                                    <!-- ฟอร์มแก้ไข (ซ่อนไว้) -->
+                                    <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $comment['user_id'] && $can_edit): ?>
+                                        <div class="mt-3 p-3 bg-light rounded d-none" id="edit-form-<?php echo $comment['comment_id']; ?>">
+                                            <form method="POST" action="sql/comment_edit.php">
+                                                <input type="hidden" name="comment_id" value="<?php echo $comment['comment_id']; ?>">
+                                                <textarea name="comment_text" class="form-control mb-2" rows="3" required><?php echo htmlspecialchars($comment['comment_text']); ?></textarea>
+                                                <button type="submit" class="btn btn-sm btn-warning">💾 บันทึก</button>
+                                                <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEditForm(<?php echo $comment['comment_id']; ?>)">ยกเลิก</button>
+                                                <small class="text-muted d-block mt-1">แก้ไขได้ภายใน 15 นาทีหลังโพสต์</small>
+                                            </form>
                                         </div>
                                     <?php endif; ?>
-                                </div>
 
-                                <!-- แสดงคำตอบกลับ (Replies) -->
-                                <?php if(count($comment['replies']) > 0): ?>
-                                    <?php foreach($comment['replies'] as $reply): ?>
-                                        <div class="reply-box" id="comment-<?php echo $reply['comment_id']; ?>">
-                                            <div class="comment-header">
-                                                <div>
-                                                    <span class="comment-author">
-                                                        <?php if($reply['admin_id']): ?>
-                                                            👨‍💼 <?php echo htmlspecialchars($reply['admin_name']); ?> <span class="badge bg-primary">Admin</span>
-                                                        <?php else: ?>
-                                                            👤 <?php echo htmlspecialchars($reply['user_first_name'] . ' ' . $reply['user_last_name']); ?>
+                                    <!-- ฟอร์มตอบกลับ (ซ่อนไว้) -->
+                                    <div class="mt-3 p-3 bg-light rounded d-none" id="reply-form-<?php echo $comment['comment_id']; ?>">
+                                        <?php if(isset($_SESSION['user_id']) || isset($_SESSION['admin_id'])): ?>
+                                            <form method="POST" action="sql/comment_add.php">
+                                                <input type="hidden" name="article_id" value="<?php echo $article_id; ?>">
+                                                <input type="hidden" name="parent_comment_id" value="<?php echo $comment['comment_id']; ?>">
+                                                <textarea name="comment_text" class="form-control mb-2" placeholder="เขียนตอบกลับ..." rows="3" required></textarea>
+                                                <button type="submit" class="btn btn-sm btn-primary">ส่งตอบกลับ</button>
+                                                <button type="button" class="btn btn-sm btn-secondary" onclick="toggleReplyForm(<?php echo $comment['comment_id']; ?>)">ยกเลิก</button>
+                                            </form>
+                                        <?php else: ?>
+                                            <div class="alert alert-info mb-0">
+                                                กรุณา <a href="user_login.php">เข้าสู่ระบบ</a> เพื่อตอบกลับความคิดเห็น
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <!-- แสดงคำตอบกลับ (Replies) -->
+                                    <?php if(count($comment['replies']) > 0): ?>
+                                        <?php foreach($comment['replies'] as $reply): ?>
+                                            <div class="ms-5 mt-3 ps-3 border-start border-success border-3" id="comment-<?php echo $reply['comment_id']; ?>">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <div>
+                                                        <span class="fw-bold text-success fs-6">
+                                                            <?php if($reply['admin_id']): ?>
+                                                                👨‍💼 <?php echo htmlspecialchars($reply['admin_name']); ?> <span class="badge bg-primary">Admin</span>
+                                                            <?php else: ?>
+                                                                👤 <?php echo htmlspecialchars($reply['user_first_name'] . ' ' . $reply['user_last_name']); ?>
+                                                            <?php endif; ?>
+                                                        </span>
+                                                        <span class="text-muted small">
+                                                            | <?php
+                                                                $time_ago = time() - strtotime($reply['created_at']);
+                                                                if ($time_ago < 60) echo 'เมื่อสักครู่';
+                                                                elseif ($time_ago < 3600) echo floor($time_ago / 60) . ' นาทีที่แล้ว';
+                                                                elseif ($time_ago < 86400) echo floor($time_ago / 3600) . ' ชั่วโมงที่แล้ว';
+                                                                else echo floor($time_ago / 86400) . ' วันที่แล้ว';
+                                                            ?>
+                                                        </span>
+                                                        <?php if($reply['updated_at']): ?>
+                                                            <span class="text-muted small fst-italic">(แก้ไขแล้ว)</span>
                                                         <?php endif; ?>
-                                                    </span>
-                                                    <span class="comment-date">
-                                                        | <?php
-                                                            $time_ago = time() - strtotime($reply['created_at']);
-                                                            if ($time_ago < 60) echo 'เมื่อสักครู่';
-                                                            elseif ($time_ago < 3600) echo floor($time_ago / 60) . ' นาทีที่แล้ว';
-                                                            elseif ($time_ago < 86400) echo floor($time_ago / 3600) . ' ชั่วโมงที่แล้ว';
-                                                            else echo floor($time_ago / 86400) . ' วันที่แล้ว';
+                                                    </div>
+                                                </div>
+
+                                                <div class="text-dark lh-base mb-3">
+                                                    <?php echo nl2br(htmlspecialchars($reply['comment_text'])); ?>
+                                                </div>
+
+                                                <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $reply['user_id']): ?>
+                                                    <div class="d-flex gap-2 mb-2">
+                                                        <?php
+                                                        $can_edit_reply = (time() - strtotime($reply['created_at'])) <= (15 * 60);
+                                                        if($can_edit_reply):
                                                         ?>
-                                                    </span>
-                                                    <?php if($reply['updated_at']): ?>
-                                                        <span class="edit-indicator">(แก้ไขแล้ว)</span>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </div>
+                                                            <button class="btn btn-sm btn-outline-warning" onclick="toggleEditForm(<?php echo $reply['comment_id']; ?>)">
+                                                                ✏️ แก้ไข
+                                                            </button>
+                                                        <?php endif; ?>
 
-                                            <div class="comment-text">
-                                                <?php echo nl2br(htmlspecialchars($reply['comment_text'])); ?>
-                                            </div>
-
-                                            <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $reply['user_id']): ?>
-                                                <div class="comment-actions">
-                                                    <?php
-                                                    $can_edit_reply = (time() - strtotime($reply['created_at'])) <= (15 * 60);
-                                                    if($can_edit_reply):
-                                                    ?>
-                                                        <button class="btn btn-sm btn-outline-warning" onclick="toggleEditForm(<?php echo $reply['comment_id']; ?>)">
-                                                            ✏️ แก้ไข
-                                                        </button>
-                                                    <?php endif; ?>
-
-                                                    <form method="POST" action="sql/comment_delete.php" style="display: inline;" onsubmit="return confirm('ยืนยันการลบความคิดเห็น?')">
-                                                        <input type="hidden" name="comment_id" value="<?php echo $reply['comment_id']; ?>">
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger">🗑️ ลบ</button>
-                                                    </form>
-                                                </div>
-
-                                                <?php if($can_edit_reply): ?>
-                                                    <div class="reply-form d-none mt-2" id="edit-form-<?php echo $reply['comment_id']; ?>">
-                                                        <form method="POST" action="sql/comment_edit.php">
+                                                        <form method="POST" action="sql/comment_delete.php" class="d-inline" onsubmit="return confirm('ยืนยันการลบความคิดเห็น?')">
                                                             <input type="hidden" name="comment_id" value="<?php echo $reply['comment_id']; ?>">
-                                                            <textarea name="comment_text" class="form-control mb-2" rows="2" required><?php echo htmlspecialchars($reply['comment_text']); ?></textarea>
-                                                            <button type="submit" class="btn btn-sm btn-warning">💾 บันทึก</button>
-                                                            <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEditForm(<?php echo $reply['comment_id']; ?>)">ยกเลิก</button>
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger">🗑️ ลบ</button>
                                                         </form>
                                                     </div>
+
+                                                    <?php if($can_edit_reply): ?>
+                                                        <div class="p-3 bg-light rounded d-none mt-2" id="edit-form-<?php echo $reply['comment_id']; ?>">
+                                                            <form method="POST" action="sql/comment_edit.php">
+                                                                <input type="hidden" name="comment_id" value="<?php echo $reply['comment_id']; ?>">
+                                                                <textarea name="comment_text" class="form-control mb-2" rows="2" required><?php echo htmlspecialchars($reply['comment_text']); ?></textarea>
+                                                                <button type="submit" class="btn btn-sm btn-warning">💾 บันทึก</button>
+                                                                <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEditForm(<?php echo $reply['comment_id']; ?>)">ยกเลิก</button>
+                                                            </form>
+                                                        </div>
+                                                    <?php endif; ?>
                                                 <?php endif; ?>
-                                            <?php endif; ?>
-                                        </div>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>
@@ -520,25 +344,27 @@ $related_articles = mysqli_query($conn, $related_sql);
                     <?php endif; ?>
 
                     <!-- ฟอร์มเขียนความคิดเห็นใหม่ -->
-                    <div class="comment-form">
-                        <h5 class="mb-3">✍️ แสดงความคิดเห็น</h5>
-                        <?php if(isset($_SESSION['user_id']) || isset($_SESSION['admin_id'])): ?>
-                            <?php if(isset($_SESSION['admin_id'])): ?>
-                                <div class="alert alert-info mb-3">
-                                    <strong>👨‍💼 คุณกำลังคอมเมนต์ในฐานะ Admin:</strong> <?php echo $_SESSION['full_name']; ?>
+                    <div class="card border-0 shadow-sm mt-4">
+                        <div class="card-body p-4">
+                            <h5 class="mb-3 fw-bold">✍️ แสดงความคิดเห็น</h5>
+                            <?php if(isset($_SESSION['user_id']) || isset($_SESSION['admin_id'])): ?>
+                                <?php if(isset($_SESSION['admin_id'])): ?>
+                                    <div class="alert alert-info mb-3">
+                                        <strong>👨‍💼 คุณกำลังคอมเมนต์ในฐานะ Admin:</strong> <?php echo $_SESSION['full_name']; ?>
+                                    </div>
+                                <?php endif; ?>
+                                <form method="POST" action="sql/comment_add.php">
+                                    <input type="hidden" name="article_id" value="<?php echo $article_id; ?>">
+                                    <textarea name="comment_text" class="form-control mb-3" placeholder="แชร์ความคิดเห็นของคุณ..." rows="4" maxlength="2000" required style="resize: vertical; min-height: 120px;"></textarea>
+                                    <small class="text-muted d-block mb-2">สูงสุด 2000 ตัวอักษร</small>
+                                    <button type="submit" class="btn btn-success shadow-sm">📨 ส่งความคิดเห็น</button>
+                                </form>
+                            <?php else: ?>
+                                <div class="alert alert-warning">
+                                    กรุณา <a href="user_login.php" class="alert-link">เข้าสู่ระบบ</a> หรือ <a href="user_register.php" class="alert-link">สมัครสมาชิก</a> เพื่อแสดงความคิดเห็น
                                 </div>
                             <?php endif; ?>
-                            <form method="POST" action="sql/comment_add.php">
-                                <input type="hidden" name="article_id" value="<?php echo $article_id; ?>">
-                                <textarea name="comment_text" class="form-control mb-3" placeholder="แชร์ความคิดเห็นของคุณ..." rows="4" maxlength="2000" required></textarea>
-                                <small class="text-muted d-block mb-2">สูงสุด 2000 ตัวอักษร</small>
-                                <button type="submit" class="btn btn-success">📨 ส่งความคิดเห็น</button>
-                            </form>
-                        <?php else: ?>
-                            <div class="alert alert-warning">
-                                กรุณา <a href="user_login.php" class="alert-link">เข้าสู่ระบบ</a> หรือ <a href="user_register.php" class="alert-link">สมัครสมาชิก</a> เพื่อแสดงความคิดเห็น
-                            </div>
-                        <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -547,27 +373,30 @@ $related_articles = mysqli_query($conn, $related_sql);
 
     <!-- Related Articles -->
     <?php if($related_articles && mysqli_num_rows($related_articles) > 0): ?>
-    <section class="related-articles">
+    <section class="bg-light py-5 mt-5">
         <div class="container">
-            <h3 class="text-center mb-4">📌 บทความที่เกี่ยวข้อง</h3>
+            <h3 class="text-center mb-4 fw-bold">📌 บทความที่เกี่ยวข้อง</h3>
 
-            <div class="row">
+            <div class="row g-4">
                 <?php while($related = mysqli_fetch_assoc($related_articles)): ?>
                     <div class="col-md-4">
                         <a href="article_detail.php?id=<?php echo $related['article_id']; ?>" class="text-decoration-none">
-                            <div class="related-card">
+                            <div class="card border-0 shadow-sm h-100">
                                 <?php if(!empty($related['image_url'])): ?>
                                     <img src="<?php echo htmlspecialchars(ltrim($related['image_url'], '/')); ?>"
                                          alt="<?php echo htmlspecialchars($related['title']); ?>"
-                                         class="related-image">
+                                         class="card-img-top"
+                                         style="height: 150px; object-fit: cover;">
                                 <?php else: ?>
-                                    <div class="related-image d-flex align-items-center justify-content-center bg-light">
+                                    <div class="d-flex align-items-center justify-content-center bg-light" style="height: 150px;">
                                         <span class="fs-1">📄</span>
                                     </div>
                                 <?php endif; ?>
 
-                                <div class="related-body">
-                                    <h5 class="related-title"><?php echo htmlspecialchars($related['title']); ?></h5>
+                                <div class="card-body p-3">
+                                    <h5 class="fw-bold text-dark mb-2" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                                        <?php echo htmlspecialchars($related['title']); ?>
+                                    </h5>
                                     <small class="text-muted">
                                         <?php echo date('d/m/Y', strtotime($related['published_at'])); ?>
                                     </small>

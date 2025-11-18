@@ -43,46 +43,7 @@ while ($type = mysqli_fetch_assoc($recycle_types)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จองรับขยะ - Green Digital</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <style>
-        .booking-card {
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-        }
-        .booking-card:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
-        .status-badge {
-            font-size: 0.85rem;
-            padding: 5px 12px;
-        }
-        .item-row {
-            background: #f8f9fa;
-            border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 8px;
-        }
-        .recycle-type-card {
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 10px;
-        }
-        .recycle-type-card:has(input[type="checkbox"]:checked) {
-            border-color: #28a745;
-            background-color: #e8f5e9;
-        }
-        .weight-input-wrapper {
-            display: none;
-            margin-top: 10px;
-        }
-        .recycle-type-card:has(input[type="checkbox"]:checked) .weight-input-wrapper {
-            display: block;
-        }
-    </style>
+
 </head>
 <body>
     <?php include 'navbar.php'; ?>
@@ -110,11 +71,14 @@ while ($type = mysqli_fetch_assoc($recycle_types)) {
         <?php endif; ?>
 
         <!-- Header -->
-        <div class="row mb-4">
-            <div class="col-12">
+        <div class="card border-0 shadow mb-4 bg-success bg-gradient text-white">
+            <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h2>📅 การจองรับขยะ</h2>
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newBookingModal">
+                    <div>
+                        <h2 class="mb-2 fw-bold">📅 การจองรับขยะ</h2>
+                        <p class="mb-0 opacity-75">จัดการและติดตามการจองรับขยะรีไซเคิลของคุณ</p>
+                    </div>
+                    <button type="button" class="btn btn-light btn-lg shadow" data-bs-toggle="modal" data-bs-target="#newBookingModal">
                         ➕ จองใหม่
                     </button>
                 </div>
@@ -165,76 +129,78 @@ while ($type = mysqli_fetch_assoc($recycle_types)) {
                     $items = mysqli_query($conn, $items_sql);
             ?>
             <div class="col-md-6">
-                <div class="booking-card">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div>
-                            <h5 class="mb-1">การจอง #<?php echo str_pad($booking['booking_id'], 6, '0', STR_PAD_LEFT); ?></h5>
-                            <small class="text-muted">
-                                📅 <?php echo date('d/m/Y', strtotime($booking['booking_date'])); ?>
-                                ⏰ <?php echo date('H:i', strtotime($booking['booking_time'])); ?> น.
-                            </small>
+                <div class="card border-0 shadow-sm mb-3">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h5 class="fw-bold mb-1">การจอง #<?php echo str_pad($booking['booking_id'], 6, '0', STR_PAD_LEFT); ?></h5>
+                                <small class="text-muted">
+                                    📅 <?php echo date('d/m/Y', strtotime($booking['booking_date'])); ?>
+                                    ⏰ <?php echo date('H:i', strtotime($booking['booking_time'])); ?> น.
+                                </small>
+                            </div>
+                            <div>
+                                <?php if ($booking['status'] == 'pending'): ?>
+                                    <span class="badge bg-warning text-dark fs-6 px-3 py-2">รอดำเนินการ</span>
+                                <?php elseif ($booking['status'] == 'confirmed'): ?>
+                                    <span class="badge bg-info fs-6 px-3 py-2">ยืนยันแล้ว</span>
+                                <?php elseif ($booking['status'] == 'completed'): ?>
+                                    <span class="badge bg-success fs-6 px-3 py-2">เสร็จสิ้น</span>
+                                <?php else: ?>
+                                    <span class="badge bg-danger fs-6 px-3 py-2">ยกเลิก</span>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                        <div>
-                            <?php if ($booking['status'] == 'pending'): ?>
-                                <span class="badge bg-warning status-badge">รอดำเนินการ</span>
-                            <?php elseif ($booking['status'] == 'confirmed'): ?>
-                                <span class="badge bg-info status-badge">ยืนยันแล้ว</span>
-                            <?php elseif ($booking['status'] == 'completed'): ?>
-                                <span class="badge bg-success status-badge">เสร็จสิ้น</span>
-                            <?php else: ?>
-                                <span class="badge bg-danger status-badge">ยกเลิก</span>
+
+                        <div class="mb-3">
+                            <strong>📍 ที่อยู่:</strong><br>
+                            <small><?php echo nl2br(htmlspecialchars($booking['pickup_address'])); ?></small>
+                        </div>
+
+                        <?php if ($items && mysqli_num_rows($items) > 0): ?>
+                            <div class="mb-3">
+                                <strong>♻️ รายการขยะ:</strong>
+                                <?php while ($item = mysqli_fetch_assoc($items)): ?>
+                                    <div class="card bg-light border-0 p-2 mb-2 mt-2">
+                                        <div class="d-flex justify-content-between">
+                                            <span><?php echo htmlspecialchars($item['type_name']); ?></span>
+                                            <span class="text-success fw-bold"><?php echo number_format($item['quantity'], 2); ?> kg</span>
+                                        </div>
+                                    </div>
+                                <?php endwhile; ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if ($booking['total_weight']): ?>
+                            <div class="mb-2">
+                                <strong>⚖️ น้ำหนักรวม:</strong> <?php echo number_format($booking['total_weight'], 2); ?> kg
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if ($booking['estimated_price']): ?>
+                            <div class="mb-3">
+                                <strong>💰 ราคาประมาณ:</strong>
+                                <span class="text-success fs-5 fw-bold"><?php echo number_format($booking['estimated_price'], 2); ?> ฿</span>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if ($booking['notes']): ?>
+                            <div class="mb-3">
+                                <strong>📝 หมายเหตุ:</strong>
+                                <small class="text-muted d-block mt-1"><?php echo nl2br(htmlspecialchars($booking['notes'])); ?></small>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="d-flex gap-2 mt-3">
+                            <a href="booking_detail.php?id=<?php echo $booking['booking_id']; ?>" class="btn btn-primary shadow-sm">
+                                👁️ รายละเอียด
+                            </a>
+                            <?php if ($booking['status'] == 'pending' || $booking['status'] == 'confirmed'): ?>
+                                <button type="button" class="btn btn-danger shadow-sm" data-bs-toggle="modal" data-bs-target="#cancelModal<?php echo $booking['booking_id']; ?>">
+                                    ❌ ยกเลิก
+                                </button>
                             <?php endif; ?>
                         </div>
-                    </div>
-
-                    <div class="mb-2">
-                        <strong>📍 ที่อยู่:</strong><br>
-                        <small><?php echo nl2br(htmlspecialchars($booking['pickup_address'])); ?></small>
-                    </div>
-
-                    <?php if ($items && mysqli_num_rows($items) > 0): ?>
-                        <div class="mb-2">
-                            <strong>♻️ รายการขยะ:</strong>
-                            <?php while ($item = mysqli_fetch_assoc($items)): ?>
-                                <div class="item-row">
-                                    <div class="d-flex justify-content-between">
-                                        <span><?php echo htmlspecialchars($item['type_name']); ?></span>
-                                        <span class="text-success"><?php echo number_format($item['quantity'], 2); ?> kg</span>
-                                    </div>
-                                </div>
-                            <?php endwhile; ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if ($booking['total_weight']): ?>
-                        <div class="mb-2">
-                            <strong>⚖️ น้ำหนักรวม:</strong> <?php echo number_format($booking['total_weight'], 2); ?> kg
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if ($booking['estimated_price']): ?>
-                        <div class="mb-3">
-                            <strong>💰 ราคาประมาณ:</strong>
-                            <span class="text-success fs-5"><?php echo number_format($booking['estimated_price'], 2); ?> ฿</span>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if ($booking['notes']): ?>
-                        <div class="mb-2">
-                            <strong>📝 หมายเหตุ:</strong>
-                            <small class="text-muted"><?php echo nl2br(htmlspecialchars($booking['notes'])); ?></small>
-                        </div>
-                    <?php endif; ?>
-
-                    <div class="d-flex gap-2 mt-3">
-                        <a href="booking_detail.php?id=<?php echo $booking['booking_id']; ?>" class="btn btn-sm btn-primary">
-                            👁️ รายละเอียด
-                        </a>
-                        <?php if ($booking['status'] == 'pending' || $booking['status'] == 'confirmed'): ?>
-                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal<?php echo $booking['booking_id']; ?>">
-                                ❌ ยกเลิก
-                            </button>
-                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -346,7 +312,7 @@ while ($type = mysqli_fetch_assoc($recycle_types)) {
                                         ?>
                                     </h6>
                                     <?php foreach ($types as $type): ?>
-                                        <div class="recycle-type-card">
+                                        <div class="recycle-type-card card border-2 p-3 mb-2">
                                             <div class="form-check">
                                                 <input class="form-check-input"
                                                        type="checkbox"

@@ -23,33 +23,6 @@ $result = mysqli_query($conn, $sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จัดการของรางวัล - Green Digital</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <style>
-        .reward-card {
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-        }
-        .reward-card:hover {
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        .points-badge {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-        .stock-badge {
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.85em;
-        }
-        .stock-ok { background-color: #d4edda; color: #155724; }
-        .stock-low { background-color: #fff3cd; color: #856404; }
-        .stock-out { background-color: #f8d7da; color: #721c24; }
-    </style>
 </head>
 <body>
     <?php include 'navbar.php'; ?>

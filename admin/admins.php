@@ -18,11 +18,6 @@ $result = mysqli_query($conn, $sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จัดการผู้ดูแลระบบ - Green Digital</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <style>
-        .bg-purple {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-    </style>
 </head>
 <body>
     <?php include 'navbar.php'; ?>
@@ -95,7 +90,7 @@ $result = mysqli_query($conn, $sql);
                             <td><?php echo htmlspecialchars($admin['email']); ?></td>
                             <td>
                                 <?php if($admin['role'] == 'admin'): ?>
-                                    <span class="badge bg-purple text-white">แอดมิน</span>
+                                    <span class="badge bg-danger">แอดมิน</span>
                                 <?php elseif($admin['role'] == 'owner'): ?>
                                     <span class="badge bg-success">เจ้าของร้าน</span>
                                 <?php else: ?>

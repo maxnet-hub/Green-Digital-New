@@ -66,46 +66,6 @@ if (!$rewards) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แลกของรางวัลให้ลูกค้า - Green Digital Admin</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <style>
-        .user-info-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-        }
-        .points-display {
-            font-size: 3rem;
-            font-weight: bold;
-        }
-        .reward-card {
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-        }
-        .reward-card:hover {
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
-        .reward-card.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .category-badge {
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.85rem;
-            font-weight: bold;
-        }
-        .search-section {
-            background: #f8f9fa;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-        }
-    </style>
 </head>
 <body>
     <?php include 'navbar.php'; ?>
