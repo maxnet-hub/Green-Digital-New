@@ -21,7 +21,7 @@ $bookings = $bookings_result ? mysqli_fetch_assoc($bookings_result)['c'] : 0;
 $transactions_result = mysqli_query($conn, "SELECT COUNT(*) as c FROM transactions WHERE user_id = '$user_id'");
 $transactions = $transactions_result ? mysqli_fetch_assoc($transactions_result)['c'] : 0;
 
-$income_result = mysqli_query($conn, "SELECT COALESCE(SUM(final_amount), 0) as total FROM transactions WHERE user_id = '$user_id' AND status = 'completed'");
+$income_result = mysqli_query($conn, "SELECT SUM(total_amount) AS total FROM transactions WHERE user_id = '$user_id' and payment_status = 'paid'");
 $total_income = $income_result ? mysqli_fetch_assoc($income_result)['total'] : 0;
 
 $co2_result = mysqli_query($conn, "SELECT COALESCE(SUM(co2_reduced), 0) as total FROM carbon_footprint WHERE user_id = '$user_id'");
