@@ -34,7 +34,7 @@ $result = mysqli_query($conn,$sql);
                 <?php if($result && mysqli_num_rows($result) > 0): ?>
                     <?php while($notif = mysqli_fetch_assoc($result)):
                         // กำหนด icon และ class ตาม type
-                        $icon = '📢';
+                        $icon = 'ประกาศ';
                         $type_class = 'type-system';
                         $type_name = 'ระบบ';
                         $badge_class = 'bg-secondary';

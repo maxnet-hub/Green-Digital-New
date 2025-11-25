@@ -78,20 +78,11 @@
                         <li><h6 class="dropdown-header">🔔 การแจ้งเตือน</h6></li>
                         <li><hr class="dropdown-divider"></li>
                         <?php if(mysqli_num_rows($notifications_result) > 0): ?>
-                            <?php while($notif = mysqli_fetch_assoc($notifications_result)):
-                                // กำหนด icon ตาม type
-                                $icon = '📢';
-                                switch($notif['type']) {
-                                    case 'booking': $icon = '🔵'; break;
-                                    case 'payment': $icon = '💚'; break;
-                                    case 'system': $icon = '⚙️'; break;
-                                    case 'promotion': $icon = '🎁'; break;
-                                }
-                            ?>
+                            <?php while($notif = mysqli_fetch_assoc($notifications_result)):?>
                             <li>
                                 <div class="dropdown-item text-wrap">
                                     <div class="d-flex align-items-start">
-                                        <span class="me-2"><?php echo $icon; ?></span>
+                                        
                                         <div class="flex-grow-1">
                                             <strong><?php echo htmlspecialchars($notif['title']); ?></strong>
                                             <p class="mb-1 small"><?php echo htmlspecialchars($notif['message']); ?></p>
