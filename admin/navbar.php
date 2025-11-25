@@ -67,7 +67,7 @@
                 ?>
                 <div class="dropdown me-3">
                     <a class="nav-link text-white position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown">
-                        🔔
+                        การแจ้งเตือน
                         <?php if($notif_count > 0): ?>
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                 <?php echo $notif_count; ?>
